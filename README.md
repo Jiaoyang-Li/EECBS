@@ -15,7 +15,7 @@ cmake .
 make
 ```
 
-Download the MAPF instances from the MAPF benchmark (https://movingai.com/benchmarks/mapf/index.html).
+You also need to download the MAPF instances from the MAPF benchmark (https://movingai.com/benchmarks/mapf/index.html).
 
 Then, you are able to run the code:
 ```
@@ -28,7 +28,6 @@ Then, you are able to run the code:
 - k: the number of agents
 - t: the runtime limit
 - suboptimality: the suboptimality factor w
-- planning_window: the planning window w
 
 You can find more details and explanations for all parameters with:
 ```
