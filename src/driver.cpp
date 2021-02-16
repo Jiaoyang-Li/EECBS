@@ -24,11 +24,12 @@ int main(int argc, char** argv)
 		// params for the input instance and experiment settings
 		("map,m", po::value<string>()->required(), "input file for map")
 		("agents,a", po::value<string>()->required(), "input file for agents")
-		("output,o", po::value<string>(), "output file for schedule")
+		("output,o", po::value<string>(), "output file for statistics")
+		("outputPaths,o", po::value<string>(), "output file for paths")
 		("agentNum,k", po::value<int>()->default_value(0), "number of agents")
 		("cutoffTime,t", po::value<double>()->default_value(7200), "cutoff time (seconds)")
 		("screen,s", po::value<int>()->default_value(1), "screen option (0: none; 1: results; 2:all)")
-		("stats", po::value<bool>()->default_value(false), "write to files some statistics")
+		("stats", po::value<bool>()->default_value(false), "write to files some detailed statistics")
 
 		// params for CBS node selection strategies
 		("highLevelSolver", po::value<string>()->default_value("EES"), "the high-level solver (A*, A*eps, EES, NEW)")
@@ -168,13 +169,13 @@ int main(int argc, char** argv)
         ecbs.runtime = runtime;
         if (vm.count("output"))
             ecbs.saveResults(vm["output"].as<string>(), vm["agents"].as<string>());
+        if (ecbs.solution_found && vm.count("outputPaths"))
+            ecbs.savePaths(vm["outputPaths"].as<string>());
         /*size_t pos = vm["output"].as<string>().rfind('.');      // position of the file extension
         string output_name = vm["output"].as<string>().substr(0, pos);     // get the name without extension
         cbs.saveCT(output_name); // for debug*/
         if (vm["stats"].as<bool>())
-        {
             ecbs.saveStats(vm["output"].as<string>(), vm["agents"].as<string>());
-        }
         ecbs.clearSearchEngines();
     }
     else
@@ -209,10 +210,10 @@ int main(int argc, char** argv)
         cbs.runtime = runtime;
         if (vm.count("output"))
             cbs.saveResults(vm["output"].as<string>(), vm["agents"].as<string>());
+        if (cbs.solution_found && vm.count("outputPaths"))
+            cbs.savePaths(vm["outputPaths"].as<string>());
         if (vm["stats"].as<bool>())
-        {
             cbs.saveStats(vm["output"].as<string>(), vm["agents"].as<string>());
-        }
         cbs.clearSearchEngines();
     }
 

@@ -1120,6 +1120,20 @@ void CBS::saveCT(const string &fileName) const // write the CT to a file
 
 }
 
+void CBS::savePaths(const string &fileName) const
+{
+    std::ofstream output;
+    output.open(fileName, std::ios::out);
+    for (int i = 0; i < num_of_agents; i++)
+    {
+        output << "Agent " << i << ": ";
+        for (const auto & t : *paths[i])
+            output << t.location << "->";
+        output << endl;
+    }
+    output.close();
+}
+
 void CBS::printConflicts(const HLNode &curr)
 {
 	for (const auto& conflict : curr.conflicts)

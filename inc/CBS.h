@@ -89,7 +89,7 @@ public:
 	void saveResults(const string &fileName, const string &instanceName) const;
 	void saveStats(const string &fileName, const string &instanceName);
 	void saveCT(const string &fileName) const; // write the CT to a file
-
+    void savePaths(const string &fileName) const; // write the paths to a file
 	void clear(); // used for rapid random  restart
 
 	int getInitialPathLength(int agent) const {return (int) paths_found_initially[agent].size() - 1; }
