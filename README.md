@@ -1,6 +1,7 @@
 # EECBS
  A bounded-suboptimal solver for Multi-Agent Path Finding
 
+This vesion assumes that agents disappear after they reach their target locations.
 
 Explicit Estimation Conflict-Based Search (EECBS) is an effifent bounded-suboptimal algorithm for solving Multi-Agent Path Finding (MAPF). 
 EECBS is 2-level search algorithm based on the popular optimal MAPF algorithm CBS. 

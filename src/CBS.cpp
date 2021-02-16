@@ -103,27 +103,6 @@ void CBS::findConflicts(HLNode& curr, int a1, int a2)
 			curr.unknownConf.push_back(conflict); // edge conflict
 		}
 	}
-	if (paths[a1]->size() != paths[a2]->size())
-	{
-		int a1_ = paths[a1]->size() < paths[a2]->size() ? a1 : a2;
-		int a2_ = paths[a1]->size() < paths[a2]->size() ? a2 : a1;
-		int loc1 = paths[a1_]->back().location;
-		for (int timestep = min_path_length; timestep < (int)paths[a2_]->size(); timestep++)
-		{
-			int loc2 = paths[a2_]->at(timestep).location;
-			if (loc1 == loc2)
-			{
-				shared_ptr<Conflict> conflict(new Conflict());
-				if (target_reasoning)
-					conflict->targetConflict(a1_, a2_, loc1, timestep);
-				else
-					conflict->vertexConflict(a1_, a2_, loc1, timestep);
-				assert(!conflict->constraint1.empty());
-				assert(!conflict->constraint2.empty());
-				curr.unknownConf.push_front(conflict); // It's at least a semi conflict			
-			}
-		}
-	}
 }
 
 
@@ -1657,21 +1636,6 @@ bool CBS::validateSolution() const
 					cout << "Agents " << a1 << " and " << a2 << " collides at (" <<
 						loc1 << "-->" << loc2 << ") at timestep " << timestep << endl;
 					return false;
-				}
-			}
-			if (paths[a1]->size() != paths[a2]->size())
-			{
-				int a1_ = paths[a1]->size() < paths[a2]->size() ? a1 : a2;
-				int a2_ = paths[a1]->size() < paths[a2]->size() ? a2 : a1;
-				int loc1 = paths[a1_]->back().location;
-				for (size_t timestep = min_path_length; timestep < paths[a2_]->size(); timestep++)
-				{
-					int loc2 = paths[a2_]->at(timestep).location;
-					if (loc1 == loc2)
-					{
-						cout << "Agents " << a1 << " and " << a2 << " collides at " << loc1 << " at timestep " << timestep << endl;
-						return false; // It's at least a semi conflict			
-					}
 				}
 			}
 		}

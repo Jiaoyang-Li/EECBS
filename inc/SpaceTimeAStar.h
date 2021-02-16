@@ -40,8 +40,7 @@ public:
 		{
 			return (s1 == s2) || (s1 && s2 &&
                         s1->location == s2->location &&
-                        s1->timestep == s2->timestep &&
-						s1->wait_at_goal == s2->wait_at_goal);
+                        s1->timestep == s2->timestep);
 		}
 	};
 };

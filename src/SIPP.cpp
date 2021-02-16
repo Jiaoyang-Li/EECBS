@@ -41,7 +41,6 @@ pair<Path, int> SIPP::findSuboptimalPath(const HLNode& node, const ConstraintTab
 	ReservationTable reservation_table(initial_constraints);
 	reservation_table.build(node, agent);
 	runtime_build_CT = (double)(clock() - t) / CLOCKS_PER_SEC;
-	int holding_time = reservation_table.getHoldingTime();
 	t = clock();
 	reservation_table.buildCAT(agent, paths);
 	runtime_build_CAT = (double)(clock() - t) / CLOCKS_PER_SEC;
@@ -60,7 +59,7 @@ pair<Path, int> SIPP::findSuboptimalPath(const HLNode& node, const ConstraintTab
 	start->focal_handle = focal_list.push(start);
 	start->in_openlist = true;
 	allNodes_table.insert(start);
-	min_f_val = max(holding_time, max((int)start->getFVal(), lowerbound));
+	min_f_val = max((int)start->getFVal(), lowerbound);
 
 
 	while (!open_list.empty()) 
@@ -72,9 +71,7 @@ pair<Path, int> SIPP::findSuboptimalPath(const HLNode& node, const ConstraintTab
 		num_expanded++;
 
 		// check if the popped node is a goal node
-        if (curr->location == goal_location && // arrive at the goal location
-			!curr->wait_at_goal && // not wait at the goal location
-			curr->timestep >= holding_time) // the agent can hold the goal location afterward
+        if (curr->location == goal_location) // arrive at the goal location
         {
             updatePath(curr, path);
             break;
@@ -161,8 +158,7 @@ void SIPP::generateChild(const Interval& interval, SIPPNode* curr, int next_loca
 
 	// generate (maybe temporary) node
 	auto next = new SIPPNode(next_location, next_g_val, next_h_val, curr, next_timestep, interval, next_conflicts, false);
-	if (next_location == goal_location && curr->location == goal_location)
-		next->wait_at_goal = true;
+
 	// try to retrieve it from the hash table
 	auto it = allNodes_table.find(next);
 	if (it == allNodes_table.end())

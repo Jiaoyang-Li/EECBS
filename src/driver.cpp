@@ -44,7 +44,6 @@ int main(int argc, char** argv)
 		("disjointSplitting", po::value<bool>()->default_value(false), "disjoint splitting")
 		("rectangleReasoning", po::value<bool>()->default_value(true), "rectangle reasoning")
 		("corridorReasoning", po::value<bool>()->default_value(true), "corridor reasoning")
-		("targetReasoning", po::value<bool>()->default_value(true), "target reasoning")
 		;
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -146,7 +145,7 @@ int main(int argc, char** argv)
         ecbs.setRectangleReasoning(vm["rectangleReasoning"].as<bool>());
         ecbs.setCorridorReasoning(vm["corridorReasoning"].as<bool>());
         ecbs.setHeuristicType(h, h_hat);
-        ecbs.setTargetReasoning(vm["targetReasoning"].as<bool>());
+        ecbs.setTargetReasoning(false);
         ecbs.setMutexReasoning(false);
         ecbs.setConflictSelectionRule(conflict);
         ecbs.setNodeSelectionRule(n);
@@ -187,7 +186,7 @@ int main(int argc, char** argv)
         cbs.setRectangleReasoning(vm["rectangleReasoning"].as<bool>());
         cbs.setCorridorReasoning(vm["corridorReasoning"].as<bool>());
         cbs.setHeuristicType(h, h_hat);
-        cbs.setTargetReasoning(vm["targetReasoning"].as<bool>());
+        cbs.setTargetReasoning(false);
         cbs.setMutexReasoning(false);
         cbs.setConflictSelectionRule(conflict);
         cbs.setNodeSelectionRule(n);
