@@ -57,7 +57,6 @@ bool MDD::buildMDD(ConstraintTable& constraint_table, const SingleAgentSolver* _
 		Node(int location, int timestep, int h_val) : location(location), timestep(timestep), h_val(h_val) {}
 	};
 	this->solver = _solver;
-	int holding_time = constraint_table.getHoldingTime(); // the earliest timestep that the agent can hold its goal location. The length_min is considered here.
 	auto root = new Node(solver->start_location, 0, solver->my_heuristic[solver->start_location]); // Root
 	// generate a heap that can save nodes (and a open_handle)
 	pairing_heap< Node*, compare<Node::compare_node> > open;
@@ -70,19 +69,14 @@ bool MDD::buildMDD(ConstraintTable& constraint_table, const SingleAgentSolver* _
 	{
 		auto curr = open.top();
 		open.pop();
-		if (goal_node == nullptr &&
-			curr->location == solver->goal_location && // arrive at the goal location
-			curr->timestep >= holding_time) // the agent can hold the goal location afterward
+        if (curr->timestep + curr->h_val > upperbound)
+            continue;
+		if (goal_node == nullptr && curr->location == solver->goal_location) // arrive at the goal location
 		{
-		    if (curr->parents.size() != 1 || curr->parents.front()->location != solver->goal_location)
-            { // skip the case where curr only have parent node who locates at goal_location
-                goal_node = curr;
-                upperbound = curr->timestep;
-                continue;
-            }
+            goal_node = curr;
+            upperbound = curr->timestep;
+            continue;
 		}
-		if (curr->timestep + curr->h_val > upperbound)
-			continue;
 		auto next_locations = solver->getNextLocations(curr->location);
 		for (int next_location : next_locations) // Try every possible move. We only add backward edges in this step.
 		{
@@ -105,14 +99,6 @@ bool MDD::buildMDD(ConstraintTable& constraint_table, const SingleAgentSolver* _
 			{
 				(*it)->parents.push_back(curr); // then add corresponding parent link and child link
                 delete next;
-                if (goal_node == nullptr &&
-                    (*it)->location == solver->goal_location && // arrive at the goal location
-                    (*it)->timestep >= holding_time && // the agent can hold the goal location afterward
-                    curr->location != solver->goal_location) // skip the case where curr only have parent node who locates at goal_location
-                {
-                    goal_node = (*it);
-                    upperbound = (*it)->timestep;
-                }
 			}
 		}
 	}

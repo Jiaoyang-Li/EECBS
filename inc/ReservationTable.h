@@ -11,7 +11,7 @@ public:
     double runtime;
 
 	ReservationTable() = default;
-	ReservationTable(size_t num_col, size_t map_size, int goal_location = -1): ConstraintTable(num_col, map_size, goal_location) {}
+	ReservationTable(size_t num_col, size_t map_size): ConstraintTable(num_col, map_size) {}
 	ReservationTable(const ConstraintTable& other) {copy(other); }
 
 
