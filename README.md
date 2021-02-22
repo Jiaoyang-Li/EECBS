@@ -44,7 +44,7 @@ you can find more maps there.
 The first line in the file contains the number of agents. 
 Each remaining line represents the start and target locations for one agent.
 For a given such line, the first two numbers are the row id and column id of the start location of an agent, 
-and the (2k+1)-th and (2k+2) numbers are the row id and column id of its  k-th target location (k > 0). 
+and the (2k+1)-th and (2k+2)-th numbers are the row id and column id of its k-th target location (k > 0). 
 
 If the input map or agent files does not exist, the software will automatically generate random instances and 
 write them to the given file names.
