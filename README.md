@@ -20,7 +20,7 @@ make
 
 Then, you are able to run the code:
 ```
-./eecbs -m random-32-32-20.map -a ragents200.txt -o test.csv --outputPaths=paths.txt -k 50 -t 60 --suboptimality=1.2 
+./eecbs -m random-32-32-20.map -a agents200.txt -o test.csv --outputPaths=paths.txt -k 50 -t 60 --suboptimality=1.2 
 ```
 
 - m: the map file from the MAPF benchmark
