@@ -61,17 +61,18 @@ public:
 	}
 
 	int getDefaultNumberOfAgents() const { return num_of_agents; }
+    vector<int>* getDistances(int loc);
 
 private:
 	  // int moves_offset[MOVE_COUNT];
 	  vector<bool> my_map;
 	  string map_fname;
 	  string agent_fname;
-
+	  int goals_per_agent = 3;
 	  int num_of_agents;
 	  vector<int> start_locations;
-	  vector<int> goal_locations;
-
+	  vector<list<int>> goal_locations; // each agent has multiple goal location candidates. It needs to visit one of them and then disappear
+	  unordered_map<int, vector<int>> distances; // distances from key to any location on the map
 	  bool loadMap();
 	  void printMap() const;
 	  void saveMap() const;
@@ -85,7 +86,6 @@ private:
 	  bool isConnected(int start, int goal); // run BFS to find a path between start and goal, return true if a path exists.
 
 	  int randomWalk(int loc, int steps) const;
-
 	  // Class  SingleAgentSolver can access private members of Node 
 	  friend class SingleAgentSolver;
 };

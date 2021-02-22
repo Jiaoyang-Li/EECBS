@@ -81,7 +81,7 @@ public:
 	double runtime_build_CAT = 0; // runtime of building conflict avoidance table
 
 	int start_location;
-	int goal_location;
+	list<int> goal_location;
 	vector<int> my_heuristic;  // this is the precomputed heuristic for this agent
 	int compute_heuristic(int from, int to) const  // compute admissible heuristic between two locations
 	{
@@ -102,12 +102,23 @@ public:
 	// int getStartLocation() const {return instance.start_locations[agent]; }
 	// int getGoalLocation() const {return instance.goal_locations[agent]; }
 
-	SingleAgentSolver(const Instance& instance, int agent) :
+	SingleAgentSolver(Instance& instance, int agent) :
 		instance(instance), //agent(agent), 
 		start_location(instance.start_locations[agent]),
 		goal_location(instance.goal_locations[agent])
 	{
-		compute_heuristics();
+	    list<vector<int>*> distances;
+	    for (int goal : goal_location)
+        {
+            distances.push_back(instance.getDistances(goal));
+        }
+        my_heuristic.resize(instance.map_size, MAX_TIMESTEP);
+	    for (int i = 0; i < instance.map_size; i++)
+        {
+            for (auto dist : distances)
+                if (dist->at(i) < my_heuristic[i])
+                    my_heuristic[i] = dist->at(i);
+        }
 	}
 
   virtual ~SingleAgentSolver(){} 

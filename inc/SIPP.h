@@ -75,7 +75,7 @@ public:
 
 	string getName() const { return "SIPP"; }
 
-	SIPP(const Instance& instance, int agent):
+	SIPP(Instance& instance, int agent):
 		SingleAgentSolver(instance, agent) {}
 
 private:

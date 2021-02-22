@@ -1446,7 +1446,7 @@ CBS::CBS(vector<SingleAgentSolver*>& search_engines,
 	mutex_helper.search_engines = search_engines;
 }
 
-CBS::CBS(const Instance& instance, bool sipp, int screen) :
+CBS::CBS(Instance& instance, bool sipp, int screen) :
 	screen(screen), suboptimality(1),
 	num_of_agents(instance.getDefaultNumberOfAgents()),
 	mdd_helper(initial_constraints, search_engines),
@@ -1466,8 +1466,6 @@ CBS::CBS(const Instance& instance, bool sipp, int screen) :
 			search_engines[i] = new SIPP(instance, i);
 		else
 			search_engines[i] = new SpaceTimeAStar(instance, i);
-
-		initial_constraints[i].goal_location = search_engines[i]->goal_location;
 	}
 	runtime_preprocessing = (double)(clock() - t) / CLOCKS_PER_SEC;
 

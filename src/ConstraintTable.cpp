@@ -99,7 +99,6 @@ void ConstraintTable::copy(const ConstraintTable& other)
 {
 	length_min = other.length_min;
 	length_max = other.length_max;
-	goal_location = other.goal_location;
 	latest_timestep = other.latest_timestep;
 	num_col = other.num_col;
 	map_size = other.map_size;
@@ -119,18 +118,6 @@ void ConstraintTable::build(const HLNode& node, int agent)
 		tie(a, x, y, t, type) = curr->constraints.front();
 		switch (type)
 		{
-			case constraint_type::LEQLENGTH:
-				assert(curr->constraints.size() == 1);
-				if (agent == a) // this agent has to reach its goal at or before timestep t.
-					length_max = min(length_max, t);
-				else // other agents cannot stay at x at or after timestep t
-					insert2CT(x, t, MAX_TIMESTEP);
-				break;
-			case constraint_type::GLENGTH:
-				assert(curr->constraints.size() == 1);
-				if (a == agent) // path of agent_id should be of length at least t + 1
-					length_min = max(length_min, t + 1);
-				break;
 			case constraint_type::POSITIVE_VERTEX:
 				assert(curr->constraints.size() == 1);
 				if (agent == a) // this agent has to be at x at timestep t 
@@ -216,9 +203,6 @@ void ConstraintTable::buildCAT(int agent, const vector<Path*>& paths, size_t cat
 		{
 			cat[timestep][paths[ag]->at(timestep).location] = true;
 		}
-		int goal = paths[ag]->back().location;
-		for (size_t timestep = paths[ag]->size(); timestep < cat_size; timestep++)
-			cat[timestep][goal] = true;
 	}
 }
 
@@ -236,25 +220,4 @@ int ConstraintTable::getNumOfConflictsForStep(size_t curr_id, size_t next_id, in
 		return 1;
 	else
 		return 0;
-}
-
-
-
-
-// return the earliest timestep that the agent can hold its goal location
-int ConstraintTable::getHoldingTime() const
-{
-	int rst = length_min;
-	auto it = ct.find(goal_location);
-	if (it != ct.end())
-	{
-		for (auto time_range : it->second)
-			rst = max(rst, time_range.second);
-	}
-	for (auto landmark : landmarks)
-	{
-		if (landmark.second != goal_location)
-			rst = max(rst, (int)landmark.first + 1);
-	}
-	return rst;
 }

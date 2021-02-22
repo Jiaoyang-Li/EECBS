@@ -62,7 +62,7 @@ public:
 
 	string getName() const { return "AStar"; }
 
-	SpaceTimeAStar(const Instance& instance, int agent):
+	SpaceTimeAStar(Instance& instance, int agent):
 		SingleAgentSolver(instance, agent) {}
 
 private:

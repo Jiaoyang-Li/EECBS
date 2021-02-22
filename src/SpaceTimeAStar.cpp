@@ -64,7 +64,7 @@ pair<Path, int> SpaceTimeAStar::findSuboptimalPath(const HLNode& node, const Con
 		auto* curr = popNode();
         assert(curr->location >= 0);
 		// check if the popped node is a goal
-		if (curr->location == goal_location) // arrive at the goal location
+		if (curr->h_val == 0) // arrive at the goal location
 		{
 			updatePath(curr, path);
 			break;

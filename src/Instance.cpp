@@ -13,6 +13,7 @@ Instance::Instance(const string& map_fname, const string& agent_fname,
 	bool succ = loadMap();
 	if (!succ)
 	{
+        cout << "Map file " << map_fname << " not found." << endl;
 		if (num_of_rows > 0 && num_of_cols > 0 && num_of_obstacles >= 0 && 
 			num_of_obstacles < num_of_rows * num_of_cols) // generate random grid
 		{
@@ -21,7 +22,6 @@ Instance::Instance(const string& map_fname, const string& agent_fname,
 		}
 		else
 		{
-			cerr << "Map file " << map_fname << " not found." << endl;
 			exit(-1);
 		}
 	}
@@ -29,6 +29,7 @@ Instance::Instance(const string& map_fname, const string& agent_fname,
 	succ = loadAgents();
 	if (!succ)
 	{
+        cout << "Agent file " << agent_fname << " not found." << endl;
 		if (num_of_agents > 0)
 		{
 			generateRandomAgents(warehouse_width);
@@ -36,7 +37,6 @@ Instance::Instance(const string& map_fname, const string& agent_fname,
 		}
 		else
 		{
-			cerr << "Agent file " << agent_fname << " not found." << endl;
 			exit(-1);
 		}
 	}
@@ -66,74 +66,34 @@ int Instance::randomWalk(int curr, int steps) const
 
 void Instance::generateRandomAgents(int warehouse_width)
 {
-	cout << "Generate " << num_of_agents << " random start and goal locations " << endl;
+	cout << "Generate " << num_of_agents << " random start and goal locations." << endl;
 	vector<bool> starts(map_size, false);
-	vector<bool> goals(map_size, false);
 	start_locations.resize(num_of_agents);
 	goal_locations.resize(num_of_agents);
 
-	if (warehouse_width == 0)//Generate agents randomly
-	{
-		// Choose random start locations
-		int k = 0;
-		while ( k < num_of_agents)
-		{
-			int x = rand() % num_of_rows, y = rand() % num_of_cols;
-			int start = linearizeCoordinate(x, y);
-			if (my_map[start] || starts[start])
-				continue;
-				
-			// update start
-			start_locations[k] = start;
-			starts[start] = true;
+	assert(warehouse_width == 0);
+    // Choose random start locations
+    int k = 0;
+    while ( k < num_of_agents)
+    {
+        int start = rand() % map_size;
+        if (my_map[start] || starts[start])
+            continue;
 
-			// find goal
-			bool flag = false;
-			int goal = randomWalk(start, RANDOM_WALK_STEPS);
-			while (goals[goal])
-				goal = randomWalk(goal, 1);
+        // update start
+        start_locations[k] = start;
+        starts[start] = true;
 
-			//update goal
-			goal_locations[k] = goal;
-			goals[goal] = true;
-
-			k++;
-		}
-	}
-	else //Generate agents for warehouse scenario
-	{
-		// Choose random start locations
-		int k = 0;
-		while (k < num_of_agents)
-		{
-			int x = rand() % num_of_rows, y = rand() % warehouse_width;
-			if (k % 2 == 0)
-				y = num_of_cols - y - 1;
-			int start = linearizeCoordinate(x, y);
-			if (starts[start])
-				continue;
-			// update start
-			start_locations[k] = start;
-			starts[start] = true;
-
-			k++;
-		}
-		// Choose random goal locations
-		k = 0;
-		while (k < num_of_agents)
-		{
-			int x = rand() % num_of_rows, y = rand() % warehouse_width;
-			if (k % 2 == 1)
-				y = num_of_cols - y - 1;
-			int goal = linearizeCoordinate(x, y);
-			if (goals[goal])
-				continue;
-			// update goal
-			goal_locations[k] = goal;
-			goals[goal] = true;
-			k++;
-		}
-	}
+        // find goal
+        for (int i = 0; i < goals_per_agent; i++)
+        {
+            int goal =  rand() % map_size;
+            while (my_map[goal])
+                goal =  rand() % map_size;
+            goal_locations[k].push_back(goal);
+        }
+        k++;
+    }
 }
 
 bool Instance::validMove(int curr, int next) const
@@ -204,7 +164,7 @@ bool Instance::isConnected(int start, int goal)
 
 void Instance::generateConnectedRandomGrid(int rows, int cols, int obstacles)
 {
-	cout << "Generate a " << rows << " x " << cols << " grid with " << obstacles << " obstacles. " << endl;
+	cout << "Generate a " << rows << " x " << cols << " grid with " << obstacles << " obstacles." << endl;
 	int i, j;
 	num_of_rows = rows + 2;
 	num_of_cols = cols + 2;
@@ -317,6 +277,7 @@ void Instance::printMap() const
 
 void Instance::saveMap() const
 {
+    cout << "Write map to file " << map_fname << endl;
 	ofstream myfile;
 	myfile.open(map_fname);
 	if (!myfile.is_open())
@@ -380,7 +341,7 @@ bool Instance::loadAgents()
 			col = atoi((*beg).c_str());
 			beg++;
 			row = atoi((*beg).c_str());
-			goal_locations[i] = linearizeCoordinate(row, col);
+			goal_locations[i].push_back(linearizeCoordinate(row, col));
 		}
 	}
 	else // My benchmark
@@ -391,7 +352,7 @@ bool Instance::loadAgents()
 		num_of_agents = atoi((*beg).c_str());
 		start_locations.resize(num_of_agents);
 		goal_locations.resize(num_of_agents);
-		for (int i = 0; i<num_of_agents; i++)
+		for (int i = 0; i < num_of_agents; i++)
 		{
 			getline(myfile, line);
 			tokenizer< char_separator<char> > col_tok(line, sep);
@@ -401,13 +362,19 @@ bool Instance::loadAgents()
 			int row = atoi((*c_beg).c_str());
 			c_beg++;
 			int col = atoi((*c_beg).c_str());
+            c_beg++;
 			start_locations[i] = linearizeCoordinate(row, col);
 			// read goal [row,col] for agent i
-			c_beg++;
-			row = atoi((*c_beg).c_str());
-			c_beg++;
-			col = atoi((*c_beg).c_str());
-			goal_locations[i] = linearizeCoordinate(row, col);
+			while (c_beg != col_tok.end())
+            {
+                row = atoi((*c_beg).c_str());
+                c_beg++;
+                if (c_beg == col_tok.end())
+                    break;
+                col = atoi((*c_beg).c_str());
+                c_beg++;
+                goal_locations[i].push_back(linearizeCoordinate(row, col));
+            }
 		}
 	}
 	myfile.close();
@@ -421,13 +388,17 @@ void Instance::printAgents() const
   for (int i = 0; i < num_of_agents; i++) 
   {
     cout << "Agent" << i << " : S=(" << getRowCoordinate(start_locations[i]) << "," << getColCoordinate(start_locations[i]) 
-				<< ") ; G=(" << getRowCoordinate(goal_locations[i]) << "," << getColCoordinate(goal_locations[i]) << ")" << endl;
+				<< ") ; G=";
+    for (int goal : goal_locations[i])
+		cout <<	"(" << getRowCoordinate(goal) << "," << getColCoordinate(goal) << "),";
+    cout << endl;
   }
 }
 
 
 void Instance::saveAgents() const
 {
+    cout << "Write agents to file " << agent_fname << endl;
   ofstream myfile;
   myfile.open(agent_fname);
   if (!myfile.is_open())
@@ -437,8 +408,12 @@ void Instance::saveAgents() const
   }
   myfile << num_of_agents << endl;
   for (int i = 0; i < num_of_agents; i++)
-    myfile << getRowCoordinate(start_locations[i]) << "," << getColCoordinate(start_locations[i]) << ","
-           << getRowCoordinate(goal_locations[i]) << "," << getColCoordinate(goal_locations[i]) << "," << endl;
+  {
+      myfile << getRowCoordinate(start_locations[i]) << "," << getColCoordinate(start_locations[i]) << ",";
+      for (int goal : goal_locations[i])
+          myfile << getRowCoordinate(goal) << "," << getColCoordinate(goal) << ",";
+      myfile << endl;
+  }
   myfile.close();
 }
 
@@ -453,4 +428,55 @@ list<int> Instance::getNeighbors(int curr) const
 			neighbors.emplace_back(next);
 	}
 	return neighbors;
+}
+
+// return the distances from loc to any location on the map
+vector<int>* Instance::getDistances(int loc)
+{
+    struct Node
+    {
+        int location;
+        int value;
+
+        Node() = default;
+        Node(int location, int value) : location(location), value(value) {}
+        // the following is used to comapre nodes in the OPEN list
+        struct compare_node
+        {
+            // returns true if n1 > n2 (note -- this gives us *min*-heap).
+            bool operator()(const Node& n1, const Node& n2) const
+            {
+                return n1.value >= n2.value;
+            }
+        };  // used by OPEN (heap) to compare nodes (top of the heap has min f-val, and then highest g-val)
+    };
+
+    auto it = distances.emplace(loc, vector<int>(map_size, MAX_TIMESTEP));
+    if(!it.second) // fail to insert, indicating that loc is an existing key in distances
+    {
+        return &(it.first->second);
+    }
+    vector<int>& dist = it.first->second;
+
+    // generate a heap that can save nodes (and a open_handle)
+    boost::heap::pairing_heap< Node, boost::heap::compare<Node::compare_node> > heap;
+
+    Node root(loc, 0);
+    dist[loc] = 0;
+    heap.push(root);  // add root to heap
+    while (!heap.empty())
+    {
+        Node curr = heap.top();
+        heap.pop();
+        for (int next_location : getNeighbors(curr.location))
+        {
+            if (dist[next_location] > curr.value + 1)
+            {
+                dist[next_location] = curr.value + 1;
+                Node next(next_location, curr.value + 1);
+                heap.push(next);
+            }
+        }
+    }
+    return &(it.first->second);
 }

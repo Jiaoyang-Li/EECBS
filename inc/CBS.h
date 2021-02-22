@@ -78,7 +78,7 @@ public:
 
 	int getLowerBound() const { return cost_lowerbound; }
 
-	CBS(const Instance& instance, bool sipp, int screen);
+	CBS(Instance& instance, bool sipp, int screen);
 	CBS(vector<SingleAgentSolver*>& search_engines,
 		const vector<ConstraintTable>& constraints,
 		vector<Path>& paths_found_initially, int screen);

@@ -71,7 +71,7 @@ pair<Path, int> SIPP::findSuboptimalPath(const HLNode& node, const ConstraintTab
 		num_expanded++;
 
 		// check if the popped node is a goal node
-        if (curr->location == goal_location) // arrive at the goal location
+        if (curr->location == 0) // arrive at the goal location
         {
             updatePath(curr, path);
             break;

@@ -1,45 +1,13 @@
 #include "ReservationTable.h"
 
 
-/*int ResevationTable::get_holding_time(int location)
-{ 
-	auto it = constraints.find(location);
-	if (it != constraints.end())
-	{
-		for (auto constraint : it->second)
-			insert_constraint(location, constraint.first, constraint.second);
-	}
-	
-	if (RT.find(location) == RT.end()) 
-	{
-		return 0;
-	}
-	int t = std::get<1>(RT[location].back());
-	if (t < INTERVAL_MAX)
-		return INTERVAL_MAX;
-	for (auto p =  RT[location].rbegin(); p != RT[location].rend(); ++p)
-	{
-		if (t == std::get<1>(*p))
-			t = std::get<0>(*p);
-		else
-			break;
-	}
-	return t;
-}*/
-
-
 // build the constraint table and the conflict avoidance table
 void ReservationTable::buildCAT(int agent, const vector<Path*>& paths)
 {
 	for (size_t ag = 0; ag < paths.size(); ag++)
 	{
-		if (ag == agent || paths[ag] == nullptr)
+		if (ag == agent || paths[ag] == nullptr || paths[ag]->size() == 1)
 			continue;
-		if (paths[ag]->size() == 1) // its start location is its goal location
-		{
-			cat[paths[ag]->front().location].emplace_back(0, MAX_TIMESTEP);
-			continue;
-		}
 		int prev_location = paths[ag]->front().location;
 		int prev_timestep = 0;
 		for (int timestep = 0; timestep < (int) paths[ag]->size(); timestep++)
@@ -104,7 +72,7 @@ void ReservationTable::insert2RT(size_t location, size_t t_min, size_t t_max)
 			++it; 
         else if (t_max <= get<0>(*it))
             break;
-       else  if (get<0>(*it) < t_min && get<1>(*it) <= t_max)
+        else if (get<0>(*it) < t_min && get<1>(*it) <= t_max)
         {
             (*it) = make_tuple(get<0>(*it), t_min, 0);
 			++it;
@@ -173,52 +141,11 @@ void ReservationTable::insertSoftConstraint2RT(size_t location, size_t t_min, si
 }
 
 
-//merge successive safe intervals with the same number of conflicts.
-/*void ReservationTable::mergeIntervals(list<Interval >& intervals) const
-{
-	if (intervals.empty())
-		return;
-	auto prev = intervals.begin();
-	auto curr = prev;
-	++curr;
-	while (curr != intervals.end())
-	{
-		if (get<1>(*prev) == get<0>(*curr) && get<2>(*prev) == get<2>(*curr))
-		{
-			*prev = make_tuple(get<0>(*prev), get<1>(*curr), get<2>(*prev));
-			curr = intervals.erase(curr);
-		}
-		else
-		{
-			prev = curr;
-			++curr;
-		}
-	}
-}*/ // we cannot merge intervals for goal locations seperated by length_min
-
-
 // update SIT at the gvien location
 void ReservationTable::updateSIT(size_t location)
 {
 	if (sit.find(location) == sit.end())
 	{
-		// length constraints for the goal location
-		if (location == goal_location) // we need to divide the same intevals into 2 parts [0, length_min) and [length_min, length_max + 1)
-		{
-			int latest_timestep = min(length_max, MAX_TIMESTEP - 1) + 1;
-			if (length_min > length_max) // the location is blocked for the entire time horizon
-			{
-				sit[location].emplace_back(0, 0, 0);
-				return;
-			}
-			if (0 < length_min)
-			{
-				sit[location].emplace_back(0, length_min, 0);
-			}
-			assert(length_min >= 0);
-			sit[location].emplace_back(length_min, latest_timestep, 0);
-		}
-
 		// negative constraints
 		const auto& it = ct.find(location); 
 		if (it != ct.end())
@@ -253,8 +180,7 @@ void ReservationTable::updateSIT(size_t location)
 			++curr;
 			while (curr != sit[location].end())
 			{
-				if (get<1>(*prev) == get<0>(*curr) && get<2>(*prev) == get<2>(*curr) &&
-					(location != goal_location || get<1>(*prev) != length_min))
+				if (get<1>(*prev) == get<0>(*curr) && get<2>(*prev) == get<2>(*curr))
 				{
 					*prev = make_tuple(get<0>(*prev), get<1>(*curr), get<2>(*prev));
 					curr = sit[location].erase(curr);
