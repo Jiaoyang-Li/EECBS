@@ -1128,7 +1128,8 @@ void CBS::savePaths(const string &fileName) const
     {
         output << "Agent " << i << ": ";
         for (const auto & t : *paths[i])
-            output << t.location << "->";
+            output << "(" << search_engines[0]->instance.getRowCoordinate(t.location)
+                   << "," << search_engines[0]->instance.getColCoordinate(t.location) << ")->";
         output << endl;
     }
     output.close();

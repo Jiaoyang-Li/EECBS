@@ -762,3 +762,27 @@ void ECBS::computeConflictPriority(shared_ptr<Conflict>& con, ECBSNode& node)
 		con->priority = conflict_priority::NON;
 	}
 }
+
+
+// used for rapid random  restart
+void ECBS::clear()
+{
+    mdd_helper.clear();
+    heuristic_helper.clear();
+    paths.clear();
+    paths_found_initially.clear();
+    min_f_vals.clear();
+
+    open_list.clear();
+    cleanup_list.clear();
+    focal_list.clear();
+    for (auto& node : allNodes_table)
+        delete node;
+    allNodes_table.clear();
+
+    dummy_start = nullptr;
+    goal_node = nullptr;
+    solution_found = false;
+    solution_cost = -2;
+}
+

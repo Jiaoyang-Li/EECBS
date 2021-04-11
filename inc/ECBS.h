@@ -14,6 +14,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////
 	// Runs the algorithm until the problem is solved or time is exhausted 
 	bool solve(double time_limit, int cost_lowerbound = 0);
+    void clear(); // used for rapid random  restart
 
 private:
 	vector<int> min_f_vals; // lower bounds of the cost of the shortest path
