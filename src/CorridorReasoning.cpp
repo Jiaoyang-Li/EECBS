@@ -135,13 +135,13 @@ shared_ptr<Conflict> CorridorReasoning::findCorridorConflict(const shared_ptr<Co
 	int corridor_length = getCorridorLength(*paths[a[0]], t[0], u[1], edge);
 	int t3, t3_, t4, t4_;
 	ConstraintTable ct1(initial_constraints[conflict->a1]);
-	ct1.build(node, conflict->a1);
+    ct1.insert2CT(node, conflict->a1);
 	t3 = search_engines[conflict->a1]->getTravelTime(paths[conflict->a1]->front().location, u[1], ct1, MAX_TIMESTEP);
 	ct1.insert2CT(edge.first, edge.second, 0, MAX_TIMESTEP); // block the corridor in both directions
 	ct1.insert2CT(edge.second, edge.first, 0, MAX_TIMESTEP);
 	t3_ = search_engines[conflict->a1]->getTravelTime(paths[conflict->a1]->front().location, u[1], ct1, t3 + 2 * corridor_length + 1);
 	ConstraintTable ct2(initial_constraints[conflict->a2]);
-	ct2.build(node, conflict->a2);
+    ct2.insert2CT(node, conflict->a2);
 	t4 = search_engines[conflict->a2]->getTravelTime(paths[conflict->a2]->front().location, u[0], ct2, MAX_TIMESTEP);
 	ct2.insert2CT(edge.first, edge.second, 0, MAX_TIMESTEP); // block the corridor in both directions
 	ct2.insert2CT(edge.second, edge.first, 0, MAX_TIMESTEP);

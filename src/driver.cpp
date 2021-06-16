@@ -45,6 +45,7 @@ int main(int argc, char** argv)
 		("rectangleReasoning", po::value<bool>()->default_value(true), "rectangle reasoning")
 		("corridorReasoning", po::value<bool>()->default_value(true), "corridor reasoning")
 		("targetReasoning", po::value<bool>()->default_value(true), "target reasoning")
+		("sipp", po::value<bool>()->default_value(0), "using SIPP as the low-level solver")
 		("restart", po::value<int>()->default_value(0), "rapid random restart times")
 		;
 	po::variables_map vm;
@@ -140,7 +141,7 @@ int main(int argc, char** argv)
     // initialize the solver
 	if (vm["lowLevelSolver"].as<bool>())
     {
-        ECBS ecbs(instance, false, vm["screen"].as<int>());
+        ECBS ecbs(instance, vm["sipp"].as<bool>(), vm["screen"].as<int>());
         ecbs.setPrioritizeConflicts(vm["prioritizingConflicts"].as<bool>());
         ecbs.setDisjointSplitting(vm["disjointSplitting"].as<bool>());
         ecbs.setBypass(vm["bypass"].as<bool>());
@@ -182,7 +183,7 @@ int main(int argc, char** argv)
     }
     else
     {
-        CBS cbs(instance, false, vm["screen"].as<int>());
+        CBS cbs(instance, vm["sipp"].as<bool>(), vm["screen"].as<int>());
         cbs.setPrioritizeConflicts(vm["prioritizingConflicts"].as<bool>());
         cbs.setDisjointSplitting(vm["disjointSplitting"].as<bool>());
         cbs.setBypass(vm["bypass"].as<bool>());

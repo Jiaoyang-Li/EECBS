@@ -13,6 +13,7 @@ public:
 	int num_of_conflicts = 0;
 	bool in_openlist = false;
 	bool wait_at_goal; // the action is to wait at the goal vertex or not. This is used for >lenghth constraints
+    bool is_goal = false;
 	// the following is used to comapre nodes in the OPEN list
 	struct compare_node
 	{
@@ -59,7 +60,7 @@ public:
 		location(location), g_val(g_val), h_val(h_val), parent(parent), timestep(timestep),
 		num_of_conflicts(num_of_conflicts), in_openlist(in_openlist), wait_at_goal(false) {}
 
-	inline double getFVal() const { return g_val + h_val; }
+	inline int getFVal() const { return g_val + h_val; }
 	void copy(const LLNode& other)
 	{
 		location = other.location;
@@ -69,6 +70,7 @@ public:
 		timestep = other.timestep;
 		num_of_conflicts = other.num_of_conflicts;
 		wait_at_goal = other.wait_at_goal;
+        is_goal = other.is_goal;
 	}
 };
 

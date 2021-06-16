@@ -57,7 +57,7 @@ bool MDD::buildMDD(ConstraintTable& constraint_table, const SingleAgentSolver* _
 		Node(int location, int timestep, int h_val) : location(location), timestep(timestep), h_val(h_val) {}
 	};
 	this->solver = _solver;
-	int holding_time = constraint_table.getHoldingTime(); // the earliest timestep that the agent can hold its goal location. The length_min is considered here.
+	int holding_time = constraint_table.getHoldingTime(solver->goal_location, constraint_table.length_min); // the earliest timestep that the agent can hold its goal location. The length_min is considered here.
 	auto root = new Node(solver->start_location, 0, solver->my_heuristic[solver->start_location]); // Root
 	// generate a heap that can save nodes (and a open_handle)
 	pairing_heap< Node*, compare<Node::compare_node> > open;
@@ -604,7 +604,7 @@ MDD * MDDTable::getMDD(HLNode& node, int id, size_t mdd_levels)
 	clock_t t = clock();
 	MDD * mdd = new MDD();
 	ConstraintTable ct(initial_constraints[id]);
-	ct.build(node, id);
+    ct.insert2CT(node, id);
 	if (node.getName() == "CBS Node")
 		mdd->buildMDD(ct, mdd_levels, search_engines[id]);
 	else // ECBS node
