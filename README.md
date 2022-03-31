@@ -12,7 +12,14 @@ More details can be found in our paper at AAAI 2021 [1].
 In addition to the techniques described in [1], we also add rapid random restart technique [2] to the code. 
 The default restart times is 0.  
 
-The code requires the external library BOOST (https://www.boost.org/). After you installed BOOST and downloaded the source code, go into the directory of the source code and compile it with CMake: 
+The code requires the external library BOOST (https://www.boost.org/). 
+You can follow the instruction on the BOOST webpage to install it. Or, 
+if you are using Ubantu, you can install it simply by
+```shell script
+sudo apt install libboost-all-dev
+```
+
+After you installed BOOST and downloaded the source code, go into the directory of the source code and compile it with CMake: 
 ```
 cmake .
 make
