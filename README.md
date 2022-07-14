@@ -12,20 +12,28 @@ More details can be found in our paper at AAAI 2021 [1].
 In addition to the techniques described in [1], we also add rapid random restart technique [2] to the code. 
 The default restart times is 0.  
 
-The code requires the external library BOOST (https://www.boost.org/). 
-You can follow the instruction on the BOOST webpage to install it. Or, 
-if you are using Ubantu, you can install it simply by
+## Usage
+The code requires the external library [boost](https://www.boost.org/).
+If you are using Ubantu, you can install it simply by
 ```shell script
 sudo apt install libboost-all-dev
+``` 
+Another easy way of installing the boost library is to install anaconda/miniconda and then
+```shell script
+conda install -c anaconda libboost
 ```
+which works for a variety of [systems](https://anaconda.org/anaconda/libboost)
+(including linux, osx, and win).
 
-After you installed BOOST and downloaded the source code, go into the directory of the source code and compile it with CMake: 
-```
-cmake .
+If neither of the above method works, you can also follow the instructions
+on the [boost](https://www.boost.org/) website and install it manually.
+
+
+After you installed boost and downloaded the source code, go into the directory of the source code and compile it with CMake:
+```shell script
+cmake -DCMAKE_BUILD_TYPE=RELEASE .
 make
 ```
-
-You also need to download the MAPF instances from the MAPF benchmark (https://movingai.com/benchmarks/mapf/index.html). In particular, the format of the scen files is explained here: https://movingai.com/benchmarks/formats.html. For a given number of agents k, the first k rows of the scen file are used to generate the k pairs of start and target locations.
 
 Then, you are able to run the code:
 ```
@@ -44,6 +52,11 @@ You can find more details and explanations for all parameters with:
 ```
 ./eecbs --help
 ```
+
+To test the code on more instances,
+you can download the MAPF instances from the [MAPF benchmark](https://movingai.com/benchmarks/mapf/index.html).
+In particular, the format of the scen files is explained [here](https://movingai.com/benchmarks/formats.html).
+For a given number of agents k, the first k rows of the scen file are used to generate the k pairs of start and target locations.
 
 ## License
 EECBS is released under USC – Research License. See license.md for further details.
