@@ -281,8 +281,8 @@ bool ECBS::generateRoot()
 		paths_found_initially[i] = search_engines[i]->findSuboptimalPath(*root, initial_constraints[i], paths, i, 0, suboptimality);
 		if (paths_found_initially[i].first.empty())
 		{
-			cout << "No path exists for agent " << i << endl;
-			return false;
+			cerr << "The start-goal locations of agent " << i << "are not connected" << endl;
+			exit(-1);
 		}
 		paths[i] = &paths_found_initially[i].first;
 		min_f_vals[i] = paths_found_initially[i].second;
