@@ -59,6 +59,8 @@ public:
 		location(location), g_val(g_val), h_val(h_val), parent(parent), timestep(timestep),
 		num_of_conflicts(num_of_conflicts), in_openlist(in_openlist), wait_at_goal(false) {}
 
+    virtual ~LLNode(){}
+
 	inline double getFVal() const { return g_val + h_val; }
 	void copy(const LLNode& other)
 	{
@@ -112,7 +114,7 @@ public:
 		compute_heuristics();
 	}
 
-  virtual ~SingleAgentSolver(){} 
+    virtual ~SingleAgentSolver(){};
 
 protected:
 	int min_f_val; // minimal f value in OPEN
