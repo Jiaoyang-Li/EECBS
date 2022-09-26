@@ -114,7 +114,7 @@ public:
 		compute_heuristics();
 	}
 
-    virtual ~SingleAgentSolver(){};
+    virtual ~SingleAgentSolver(){}
 
 protected:
 	int min_f_val; // minimal f value in OPEN
