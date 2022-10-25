@@ -18,7 +18,7 @@ The code requires the external library BOOST (https://www.boost.org/). After you
 
 ## Usage
 The code requires the external library [boost](https://www.boost.org/).
-If you are using Ubantu, you can install it simply by
+If you are using Ubuntu, you can install it simply by
 ```shell script
 sudo apt install libboost-all-dev
 ``` 
