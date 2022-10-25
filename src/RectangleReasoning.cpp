@@ -1,5 +1,7 @@
 #include "RectangleReasoning.h"
 
+#include <memory>
+
 
 shared_ptr<Conflict> RectangleReasoning::run(const vector<Path*>& paths, int timestep,
 	int a1, int a2, const MDD* mdd1, const MDD* mdd2)
@@ -69,7 +71,7 @@ shared_ptr<Conflict> RectangleReasoning::findRectangleConflictByGR(const vector<
 
 	if (!blocked(*paths[a1], constraint1) || !blocked(*paths[a2], constraint2))
 		return nullptr;
-	auto rectangle = shared_ptr<Conflict>(new Conflict());
+	auto rectangle = std::make_shared<Conflict>();
 	rectangle->rectangleConflict(a1, a2, Rs, Rg, Rg_t, constraint1, constraint2);
 	if (type == 2)
 		rectangle->priority = conflict_priority::CARDINAL;
@@ -128,7 +130,7 @@ shared_ptr<Conflict> RectangleReasoning::findRectangleConflictByRM(const vector<
                         {
 							type = new_type;
 							area = new_area;
-							rectangle = shared_ptr<Conflict>(new Conflict());
+							rectangle = std::make_shared<Conflict>();
 							rectangle->rectangleConflict(a1, a2, Rs, Rg, Rg_t, constraint1, constraint2);
                             if (type == 2)
 							{
@@ -260,7 +262,7 @@ bool RectangleReasoning::ExtractBarriers(const MDD& mdd, int loc, int timestep,
 				barrier_end_y = instance.getColCoordinate(loc) + sign2 * (extent_U[i] - time_offset);
 			}
 			barrier_end_time = extent_U[i];
-			B.emplace_back(-1,  // for now, the agent index is not important,  so we just use -1 for simplexity.
+			B.emplace_back(-1,  // for now, the agent index is not important,  so we just use -1 for simplicity.
 				instance.linearizeCoordinate(barrier_start_x, barrier_start_y),
 				instance.linearizeCoordinate(barrier_end_x, barrier_end_y), 
 				barrier_end_time, constraint_type::BARRIER);
@@ -351,7 +353,7 @@ bool RectangleReasoning::blockedNodes(const vector<PathEntry>& path,
 	return false;
 }
 
-bool RectangleReasoning::isCut(const Constraint b, const pair<int, int>& Rs, const pair<int, int>& Rg)
+bool RectangleReasoning::isCut(const Constraint& b, const pair<int, int>& Rs, const pair<int, int>& Rg)
 {
 	pair<int, int> b_l = instance.getCoordinate(get<1>(b));
 	pair<int, int> b_u = instance.getCoordinate(get<2>(b));
@@ -736,7 +738,6 @@ bool RectangleReasoning::hasNodeOnBarrier(const MDD* mdd, int y_start, int y_end
 			loc = instance.linearizeCoordinate(x, y_start + (t2 - t_min) * sign);
 		else
 			loc = instance.linearizeCoordinate(y_start + (t2 - t_min) * sign, x);
-		MDDNode* it = nullptr;
 		for (MDDNode* n : mdd->levels[t2])
 		{
 			if (n->location == loc)
@@ -798,7 +799,7 @@ bool RectangleReasoning::addModifiedHorizontalBarrierConstraint(int agent, const
 }
 
 
-// add a vertival modified barrier constraint
+// add a vertical modified barrier constraint
 bool RectangleReasoning::addModifiedVerticalBarrierConstraint(int agent, const MDD* mdd, int y,
 	int Ri_x, int Rg_x, int Rg_t, list<Constraint>& constraints)
 {

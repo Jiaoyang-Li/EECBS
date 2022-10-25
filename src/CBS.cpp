@@ -205,7 +205,7 @@ shared_ptr<Conflict> CBS::chooseConflict(const HLNode &node) const
 void CBS::computeSecondPriorityForConflict(Conflict& conflict, const HLNode& node)
 {
 	int count[2] = {0, 0};
-	switch (conflict_seletion_rule)
+	switch (conflict_selection_rule)
 	{
 	case conflict_selection::RANDOM:
 		conflict.secondary_priority = 0;
@@ -809,7 +809,7 @@ CBSNode* CBS::selectNode()
 }
 
 
-set<int> CBS::getInvalidAgents(const list<Constraint>& constraints)  // return agents that violates the constraints
+set<int> CBS::getInvalidAgents(const list<Constraint>& constraints)  // return agents that violate the constraints
 {
 	set<int> agents;
 	int agent, x, y, t;
@@ -1316,7 +1316,7 @@ bool CBS::solve(double _time_limit, int _cost_lowerbound, int _cost_upperbound)
 					delete i;
 					i = nullptr;
 				}
-				if (PC) // priortize conflicts
+				if (PC) // prioritize conflicts
 					classifyConflicts(*curr);
 			}
 			else
@@ -1500,7 +1500,7 @@ CBS::CBS(const Instance& instance, bool sipp, int screen) :
 }
 
 
-//generate random permuattion of agent indices
+//generate random permutation of agent indices
 vector<int> CBS::shuffleAgents() const
 {
 	vector<int> agents(num_of_agents);
@@ -1532,7 +1532,7 @@ bool CBS::generateRoot()
 	{
 		paths_found_initially.resize(num_of_agents);
 
-		//generate random permuattion of agent indices
+		//generate random permutation of agent indices
 		vector<int> agents(num_of_agents);
 		for (int i = 0; i < num_of_agents; i++)
 		{

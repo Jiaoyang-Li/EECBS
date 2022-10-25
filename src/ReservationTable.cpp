@@ -1,7 +1,7 @@
 #include "ReservationTable.h"
 
 
-/*int ResevationTable::get_holding_time(int location)
+/*int ReservationTable::get_holding_time(int location)
 { 
 	auto it = constraints.find(location);
 	if (it != constraints.end())

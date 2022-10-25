@@ -128,7 +128,7 @@ pair<Path, int> SpaceTimeAStar::findSuboptimalPath(const HLNode& node, const Con
                 (existing_next->getFVal() == next->getFVal() &&
                  existing_next->num_of_conflicts > next->num_of_conflicts)) // or it remains the same but there's fewer conflicts
             {
-                if (!existing_next->in_openlist) // if its in the closed list (reopen)
+                if (!existing_next->in_openlist) // if it is in the closed list (reopen)
                 {
                     existing_next->copy(*next);
                     pushNode(existing_next);

@@ -471,7 +471,7 @@ void SIPP::releaseNodes()
     useless_nodes.clear();
 }
 
-// return true iff we the new node is not dominated by any old node
+// return true iff the new node is not dominated by any old node
 bool SIPP::dominanceCheck(SIPPNode* new_node)
 {
     auto ptr = allNodes_table.find(new_node);

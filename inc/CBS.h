@@ -14,8 +14,8 @@ public:
 	/////////////////////////////////////////////////////////////////////////////////////
 	// stats
 	double runtime = 0;
-	double runtime_generate_child = 0; // runtimr of generating child nodes
-	double runtime_build_CT = 0; // runtimr of building constraint table
+	double runtime_generate_child = 0; // runtime of generating child nodes
+	double runtime_build_CT = 0; // runtime of building constraint table
 	double runtime_build_CAT = 0; // runtime of building conflict avoidance table
 	double runtime_path_finding = 0; // runtime of finding paths for single agents
 	double runtime_detect_conflicts = 0;
@@ -37,7 +37,7 @@ public:
 
 	uint64_t num_cleanup = 0; // number of expanded nodes chosen from cleanup list
 	uint64_t num_open = 0; // number of expanded nodes chosen from open list
-	uint64_t num_focal = 0; // number of expanded nodes chsoen from focal list
+	uint64_t num_focal = 0; // number of expanded nodes chosen from focal list
 	// CBSNode* dummy_start = nullptr;
 	// CBSNode* goal_node = nullptr;
 	HLNode* dummy_start = nullptr;
@@ -62,8 +62,8 @@ public:
 	void setMutexReasoning(bool m) {mutex_reasoning = m; heuristic_helper.mutex_reasoning = m; }
 	void setDisjointSplitting(bool d) {disjoint_splitting = d; heuristic_helper.disjoint_splitting = d; }
 	void setBypass(bool b) { bypass = b; } // 2-agent solver for heuristic calculation does not need bypass strategy.
-	void setConflictSelectionRule(conflict_selection c) { conflict_seletion_rule = c; heuristic_helper.conflict_seletion_rule = c; }
-	void setNodeSelectionRule(node_selection n) { node_selection_fule = n; heuristic_helper.node_selection_rule = n; }
+	void setConflictSelectionRule(conflict_selection c) { conflict_selection_rule = c; heuristic_helper.conflict_seletion_rule = c; }
+	void setNodeSelectionRule(node_selection n) { node_selection_rule = n; heuristic_helper.node_selection_rule = n; }
 	void setSavingStats(bool s) { save_stats = s; heuristic_helper.save_stats = s; }
 	void setHighLevelSolver(high_level_solver_type s, double w)
 	{
@@ -103,8 +103,8 @@ protected:
 	bool PC; // prioritize conflicts
 	bool save_stats;
 	high_level_solver_type solver_type; // the solver for the high-level search
-	conflict_selection conflict_seletion_rule;
-	node_selection node_selection_fule;
+	conflict_selection conflict_selection_rule;
+	node_selection node_selection_rule;
 
 	MDDTable mdd_helper;	
 	RectangleReasoning rectangle_helper;
@@ -138,7 +138,7 @@ protected:
 	vector < SingleAgentSolver* > search_engines;  // used to find (single) agents' paths and mdd
 
 	void addConstraints(const HLNode* curr, HLNode* child1, HLNode* child2) const;
-	set<int> getInvalidAgents(const list<Constraint>& constraints); // return agents that violates the constraints
+	set<int> getInvalidAgents(const list<Constraint>& constraints); // return agents that violate the constraints
 	//conflicts
 	void findConflicts(HLNode& curr);
 	void findConflicts(HLNode& curr, int a1, int a2);
@@ -157,7 +157,7 @@ protected:
 	bool validateSolution() const;
 	inline int getAgentLocation(int agent_id, size_t timestep) const;
 
-	vector<int> shuffleAgents() const;  //generate random permuattion of agent indices
+	vector<int> shuffleAgents() const;  //generate random permutation of agent indices
 	bool terminate(HLNode* curr); // check the stop condition and return true if it meets
 	void computeConflictPriority(shared_ptr<Conflict>& con, CBSNode& node); // check the conflict is cardinal, semi-cardinal or non-cardinal
 

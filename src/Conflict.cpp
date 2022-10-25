@@ -67,7 +67,7 @@ std::ostream& operator<<(std::ostream& os, const Conflict& conflict)
 			os << "rectangle";
 			break;
 		case conflict_type::CORRIDOR:
-			os << "corrdior";
+			os << "corridor";
 			break;
 		case conflict_type::TARGET:
 			os << "target";

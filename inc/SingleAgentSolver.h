@@ -12,9 +12,9 @@ public:
 	int timestep = 0;
 	int num_of_conflicts = 0;
 	bool in_openlist = false;
-	bool wait_at_goal; // the action is to wait at the goal vertex or not. This is used for >lenghth constraints
+	bool wait_at_goal; // the action is to wait at the goal vertex or not. This is used for >length constraints
     bool is_goal = false;
-	// the following is used to comapre nodes in the OPEN list
+	// the following is used to compare nodes in the OPEN list
 	struct compare_node
 	{
 		// returns true if n1 > n2 (note -- this gives us *min*-heap).
@@ -81,7 +81,7 @@ public:
 	uint64_t num_expanded = 0;
 	uint64_t num_generated = 0;
 
-	double runtime_build_CT = 0; // runtimr of building constraint table
+	double runtime_build_CT = 0; // runtime of building constraint table
 	double runtime_build_CAT = 0; // runtime of building conflict avoidance table
 
 	int start_location;
@@ -114,7 +114,7 @@ public:
 		compute_heuristics();
 	}
 
-    virtual ~SingleAgentSolver(){}
+    virtual ~SingleAgentSolver() =default;
 
 protected:
 	int min_f_val; // minimal f value in OPEN

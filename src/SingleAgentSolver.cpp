@@ -18,7 +18,7 @@ void SingleAgentSolver::compute_heuristics()
 
 		Node() = default;
 		Node(int location, int value) : location(location), value(value) {}
-		// the following is used to comapre nodes in the OPEN list
+		// the following is used to compare nodes in the OPEN list
 		struct compare_node
 		{
 			// returns true if n1 > n2 (note -- this gives us *min*-heap).
@@ -31,7 +31,7 @@ void SingleAgentSolver::compute_heuristics()
 
 	my_heuristic.resize(instance.map_size, MAX_TIMESTEP);
 
-	// generate a heap that can save nodes (and a open_handle)
+	// generate a heap that can save nodes (and an open_handle)
 	boost::heap::pairing_heap< Node, boost::heap::compare<Node::compare_node> > heap;
 
 	Node root(goal_location, 0);

@@ -24,7 +24,7 @@ int CorridorReasoning::findCorridor(const shared_ptr<Conflict>& conflict,
 	tie(agent, loc2, loc1, t, type) = conflict->constraint1.back();
 	if (t < 1)
 		return 0;
-	if (loc1 < 0) // vertex conflcit
+	if (loc1 < 0) // vertex conflict
 	{
 		if (search_engines[0]->instance.getDegree(loc2) != 2)
 			return 0; // not a corridor 
@@ -69,7 +69,7 @@ int CorridorReasoning::findCorridor(const shared_ptr<Conflict>& conflict,
 			}
 		}
 		else // exit the corridor without hitting endpoint2
-		{ // indicating that the two agents mvoe in the same direction
+		{ // indicating that the two agents move in the same direction
 			return 0;
 		}
 		corridor_length++;
@@ -207,7 +207,7 @@ int CorridorReasoning::getCorridorLength(const vector<PathEntry>& path, int t_st
 		next = path[t].location;
 		if (next == curr) // wait
 			continue;
-		else if (next == prev) // turn aournd
+		else if (next == prev) // turn around
 			moveForward = !moveForward;
 		if (moveForward)
 		{
@@ -235,7 +235,7 @@ int CorridorReasoning::getCorridorLength(const vector<PathEntry>& path, int t_st
 	// boost::heap::pairing_heap< AStarNode*, boost::heap::compare<AStarNode::compare_node> >::handle_type open_handle;
 	unordered_set<AStarNode*, AStarNode::NodeHasher, AStarNode::eqnode> nodes;
 
-	auto root = new AStarNode(start, 0, getMahattanDistance(start, end, num_col), nullptr, 0);
+	auto root = new AStarNode(start, 0, getManhattanDistance(start, end, num_col), nullptr, 0);
 	root->open_handle = heap.push(root);  // add root to heap
 	nodes.insert(root);       // add root to hash_table (nodes)
 	int moves_offset[4] = { 1, -1, num_col, -num_col };
@@ -260,7 +260,7 @@ int CorridorReasoning::getCorridorLength(const vector<PathEntry>& path, int t_st
 					continue;
 				}
 				int next_g_val = curr->g_val + 1;
-				auto next = new LLNode(next_loc, next_g_val, getMahattanDistance(next_loc, end, num_col), nullptr, 0);
+				auto next = new LLNode(next_loc, next_g_val, getManhattanDistance(next_loc, end, num_col), nullptr, 0);
 				auto it = nodes.find(next);
 				if (it == nodes.end())
 				{  // add the newly generated node to heap and hash table

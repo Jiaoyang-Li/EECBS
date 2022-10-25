@@ -273,7 +273,7 @@ bool ECBS::generateRoot()
 	// initialize paths_found_initially
 	assert(paths_found_initially.empty());
 	paths_found_initially.resize(num_of_agents);
-	//generate random permuattion of agent indices
+	//generate random permutation of agent indices
 	auto agents = shuffleAgents();
 
 	for (auto i : agents)

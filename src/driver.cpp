@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 		("rectangleReasoning", po::value<bool>()->default_value(true), "rectangle reasoning")
 		("corridorReasoning", po::value<bool>()->default_value(true), "corridor reasoning")
 		("targetReasoning", po::value<bool>()->default_value(true), "target reasoning")
-		("sipp", po::value<bool>()->default_value(0), "using SIPP as the low-level solver")
+		("sipp", po::value<bool>()->default_value(0), "using SIPPS as the low-level solver")
 		("restart", po::value<int>()->default_value(0), "rapid random restart times")
 		;
 	po::variables_map vm;
