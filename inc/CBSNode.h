@@ -58,6 +58,8 @@ public:
 	// void printConflictGraph(int num_of_agents) const;
 	void updateDistanceToGo();
 	void printConstraints(int id) const;
+
+    virtual ~HLNode(){}
 };
 
 std::ostream& operator<<(std::ostream& os, const HLNode& node);

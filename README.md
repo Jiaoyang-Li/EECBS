@@ -2,7 +2,7 @@
  A bounded-suboptimal solver for Multi-Agent Path Finding
 
 
-Explicit Estimation Conflict-Based Search (EECBS) is an effifent bounded-suboptimal algorithm for solving Multi-Agent Path Finding (MAPF). 
+Explicit Estimation Conflict-Based Search (EECBS) is an efficient bounded-suboptimal algorithm for solving Multi-Agent Path Finding (MAPF). 
 EECBS is 2-level search algorithm based on the popular optimal MAPF algorithm CBS. 
 It speeds up CBS by using Explicit Estimation Search (EES) on its high level and focal search on its low level. 
 It also incorporates with many CBS improvements, including 
@@ -15,12 +15,29 @@ The default restart times is 0.
 Moreover, we also added a SIPP option that uses SIPPS [3] (instead of state-time A*) in the low level of EECBS to plan paths for agents.
 
 The code requires the external library BOOST (https://www.boost.org/). After you installed BOOST and downloaded the source code, go into the directory of the source code and compile it with CMake: 
+
+## Usage
+The code requires the external library [boost](https://www.boost.org/).
+If you are using Ubantu, you can install it simply by
+```shell script
+sudo apt install libboost-all-dev
+``` 
+Another easy way of installing the boost library is to install anaconda/miniconda and then
+```shell script
+conda install -c anaconda libboost
 ```
-cmake .
+which works for a variety of [systems](https://anaconda.org/anaconda/libboost)
+(including linux, osx, and win).
+
+If neither of the above method works, you can also follow the instructions
+on the [boost](https://www.boost.org/) website and install it manually.
+
+
+After you installed boost and downloaded the source code, go into the directory of the source code and compile it with CMake:
+```shell script
+cmake -DCMAKE_BUILD_TYPE=RELEASE .
 make
 ```
-
-You also need to download the MAPF instances from the MAPF benchmark (https://movingai.com/benchmarks/mapf/index.html).
 
 Then, you are able to run the code:
 ```
@@ -39,6 +56,11 @@ You can find more details and explanations for all parameters with:
 ```
 ./eecbs --help
 ```
+
+To test the code on more instances,
+you can download the MAPF instances from the [MAPF benchmark](https://movingai.com/benchmarks/mapf/index.html).
+In particular, the format of the scen files is explained [here](https://movingai.com/benchmarks/formats.html).
+For a given number of agents k, the first k rows of the scen file are used to generate the k pairs of start and target locations.
 
 ## License
 EECBS is released under USC – Research License. See license.md for further details.
