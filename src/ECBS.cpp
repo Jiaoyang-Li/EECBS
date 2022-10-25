@@ -714,7 +714,7 @@ void ECBS::computeConflictPriority(shared_ptr<Conflict>& con, ECBSNode& node)
 	else
 		mdd1 = mdd_helper.getMDD(node, a1, paths[a1]->size());
     if (search_engines[a2]->goal_location < 0) // We assume that non-goal agents always have non-cardinal conflicts.
-        cardinal1 = false;
+        cardinal2 = false;
 	else if (timestep >= (int)paths[a2]->size())
 		cardinal2 = true;
 	else
