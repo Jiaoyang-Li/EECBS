@@ -12,6 +12,8 @@ More details can be found in our paper at AAAI 2021 [1].
 In addition to the techniques described in [1], we also add rapid random restart technique [2] to the code. 
 The default restart times is 0.  
 
+Moreover, we also added a SIPP option that uses SIPPS [3] (instead of state-time A*) in the low level of EECBS to plan paths for agents.
+
 The code requires the external library BOOST (https://www.boost.org/). After you installed BOOST and downloaded the source code, go into the directory of the source code and compile it with CMake: 
 ```
 cmake .
@@ -44,5 +46,13 @@ EECBS is released under USC – Research License. See license.md for further det
 ## References
 [1] Jiaoyang Li, Wheeler Ruml and Sven Koenig.
 EECBS: Bounded-Suboptimal Search for Multi-Agent Path Finding.
-In Proceedings of the AAAI Conference on Artificial Intelligence (AAAI), (in print), 2021.
+In Proceedings of the AAAI Conference on Artificial Intelligence (AAAI), pages 12353-12362, 2021.
+
+[2] Liron Cohen, Glenn Wagner, David M. Chan, Howie Choset, Nathan R. Sturtevant, Sven Koenig and T. K. Satish Kumar.
+Rapid Randomized Restarts for Multi-Agent Path Finding Solvers.
+In Proceedings of the Symposium on Combinatorial Search (SoCS), pages 148-152, 2018.
+
+[3] Jiaoyang Li, Zhe Chen, Daniel Harabor, Peter J. Stuckey and Sven Koenig. 
+MAPF-LNS2: Fast Repairing for Multi-Agent Path Finding via Large Neighborhood Search.
+In Proceedings of the AAAI Conference on Artificial Intelligence, pages 10256-10265, 2022.
 
