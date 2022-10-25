@@ -181,7 +181,7 @@ void ConstraintTable::insert2CAT(const Path& path)
         cat.resize(map_size);
         cat_goals.resize(map_size, MAX_TIMESTEP);
     }
-    assert(cat_goals[path.back().location] == MAX_TIMESTEP);
+    // assert(cat_goals[path.back().location] == MAX_TIMESTEP); // We comment this out because it is possible that two non-goal locations end at the same location in a CBS node
     cat_goals[path.back().location] = path.size() - 1;
     for (auto timestep = (int)path.size() - 1; timestep >= 0; timestep--)
     {

@@ -1,4 +1,4 @@
-//#pragma warning(disable: 4996) //Jiaoyang: I added this line to disable error C4996 caused by CPLEX
+//#pragma warning(disable: 4996) //Added this line to disable error C4996 caused by CPLEX
 #include "CBSHeuristic.h"
 #include "CBS.h"
 #include <queue>
@@ -553,7 +553,8 @@ bool CBSHeuristic::buildWeightedDependencyGraph(CBSNode& node, vector<int>& CG)
 		else
 		{
 			bool cardinal = conflict->priority == conflict_priority::CARDINAL;
-			if (!cardinal && !mutex_reasoning) // using merging MDD methods before runing 2-agent instance
+			if (!cardinal and !mutex_reasoning and
+                search_engines[a1]->goal_location >= 0 and search_engines[a2]->goal_location >= 0) // using merging MDD methods before running 2-agent instance
 			{
 				cardinal = dependent(a1, a2, node);
 			}
@@ -1232,7 +1233,7 @@ int CBSHeuristic::weightedVertexCover(const std::vector<int>& CG)
 	return rst;
 }
 
-// recusive component of weighted vertex cover
+// recursive component of weighted vertex cover
 int CBSHeuristic::DPForWMVC(std::vector<int>& x, int i, int sum, const std::vector<int>& CG,
 	const std::vector<int>& range, int& best_so_far)
 {
@@ -1370,7 +1371,7 @@ int CBSHeuristic::DPForWMVC(std::vector<int>& x, int i, int sum, const std::vect
 	return rst;
 }*/
 
-// recusive component of weighted vertex cover
+// recursive component of weighted vertex cover
 int CBSHeuristic::DPForConstrainedWMVC(std::vector<bool>& x, int i, int sum, const std::vector<int>& CG, const std::vector<int>& range, int& best_so_far)
 {
 	if (sum >= best_so_far)
@@ -1483,7 +1484,7 @@ bool CBSHeuristic::SyncMDDs(const MDD &mdd, const MDD& other) // assume mdd.leve
 	{
 		for (auto node = copy.levels[i].begin(); node != copy.levels[i].end();)
 		{
-			// Go over all the node's parents and test their coexisting nodes' children for co-existance with this node
+			// Go over all the node's parents and test their coexisting nodes' children for co-existence with this node
 			for (auto parent = (*node)->parents.begin(); parent != (*node)->parents.end(); parent++)
 			{
 				//bool validParent = false;

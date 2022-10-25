@@ -1,6 +1,10 @@
 # EECBS
  A bounded-suboptimal solver for Multi-Agent Path Finding
 
+**This branch allows agents to have zero goal locations.
+Their goal locations are represented by -1 in the scen files (see example in my.map and my.scen).
+They can complete their paths at any location on the map
+except for the locations in the avoid_locations set maintained by the Instance class.**
 
 Explicit Estimation Conflict-Based Search (EECBS) is an efficient bounded-suboptimal algorithm for solving Multi-Agent Path Finding (MAPF). 
 EECBS is 2-level search algorithm based on the popular optimal MAPF algorithm CBS. 

@@ -70,9 +70,13 @@ pair<Path, int> SpaceTimeAStar::findSuboptimalPath(const HLNode& node, const Con
         auto* curr = popNode();
         assert(curr->location >= 0);
         // check if the popped node is a goal
-        if (curr->location == goal_location && // arrive at the goal location
-            !curr->wait_at_goal && // not wait at the goal location
-            curr->timestep >= holding_time) // the agent can hold the goal location afterward
+        if ((goal_location < 0 and // non-goal agent
+             instance.avoid_locations.count(curr->location) == 0 and // not on the prohibited locations
+             curr->timestep >= constraint_table.getHoldingTime(curr->location, constraint_table.length_min)) or // can stay at this location without collisions
+            (goal_location >= 0 and  //goal agent
+             curr->location == goal_location && // arrive at the goal location
+             !curr->wait_at_goal && // not wait at the goal location
+             curr->timestep >= holding_time)) // the agent can hold the goal location afterward
         {
             updatePath(curr, path);
             break;

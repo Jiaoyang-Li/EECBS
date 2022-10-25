@@ -670,6 +670,8 @@ void ECBS::classifyConflicts(ECBSNode &node)
 
 		// Rectangle reasoning
 		if (rectangle_reasoning &&
+            search_engines[con->a1]->goal_location >= 0 and
+            search_engines[con->a2]->goal_location >= 0 and // both agents have fixed goal locations
 		    (int)paths[a1]->size() - 1 == min_f_vals[a1] && // the paths for both agents are their shortest paths
 		    (int)paths[a2]->size() - 1 == min_f_vals[a2] &&
             min_f_vals[a1] > timestep &&  //conflict happens before both agents reach their goal locations
@@ -705,29 +707,29 @@ void ECBS::computeConflictPriority(shared_ptr<Conflict>& con, ECBSNode& node)
 	constraint_type type = get<4>(con->constraint1.back());
 	bool cardinal1 = false, cardinal2 = false;
 	MDD *mdd1 = nullptr, *mdd2 = nullptr;
-	if (timestep >= (int)paths[a1]->size())
+    if (search_engines[a1]->goal_location < 0) // We assume that non-goal agents always have non-cardinal conflicts.
+        cardinal1 = false;
+    else if (timestep >= (int)paths[a1]->size())
 		cardinal1 = true;
-	else //if (!paths[a1]->at(0).is_single())
-	{
+	else
 		mdd1 = mdd_helper.getMDD(node, a1, paths[a1]->size());
-	}
-	if (timestep >= (int)paths[a2]->size())
+    if (search_engines[a2]->goal_location < 0) // We assume that non-goal agents always have non-cardinal conflicts.
+        cardinal1 = false;
+	else if (timestep >= (int)paths[a2]->size())
 		cardinal2 = true;
-	else //if (!paths[a2]->at(0).is_single())
-	{
+	else
 		mdd2 = mdd_helper.getMDD(node, a2, paths[a2]->size());
-	}
 
 	if (type == constraint_type::EDGE) // Edge conflict
 	{
-		if (timestep < (int)mdd1->levels.size())
+		if (mdd1 != nullptr and timestep < (int)mdd1->levels.size())
 		{
 			cardinal1 = mdd1->levels[timestep].size() == 1 &&
 				mdd1->levels[timestep].front()->location == paths[a1]->at(timestep).location &&
 				mdd1->levels[timestep - 1].size() == 1 &&
 				mdd1->levels[timestep - 1].front()->location == paths[a1]->at(timestep - 1).location;
 		}
-		if (timestep < (int)mdd2->levels.size())
+		if (mdd2 != nullptr and timestep < (int)mdd2->levels.size())
 		{
 			cardinal2 = mdd2->levels[timestep].size() == 1 &&
 				mdd2->levels[timestep].front()->location == paths[a2]->at(timestep).location &&
@@ -737,12 +739,12 @@ void ECBS::computeConflictPriority(shared_ptr<Conflict>& con, ECBSNode& node)
 	}
 	else // vertex conflict or target conflict
 	{
-		if (!cardinal1 && timestep < (int)mdd1->levels.size())
+		if (!cardinal1 and mdd1 != nullptr and timestep < (int)mdd1->levels.size())
 		{
 			cardinal1 = mdd1->levels[timestep].size() == 1 &&
 				mdd1->levels[timestep].front()->location == paths[a1]->at(timestep).location;
 		}
-		if (!cardinal2 && timestep < (int)mdd2->levels.size())
+		if (!cardinal2 and mdd2 != nullptr and timestep < (int)mdd2->levels.size())
 		{
 			cardinal2 = mdd2->levels[timestep].size() == 1 &&
 				mdd2->levels[timestep].front()->location == paths[a2]->at(timestep).location;

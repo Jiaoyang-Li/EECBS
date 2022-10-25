@@ -58,6 +58,8 @@ void ReservationTable::insert2SIT(int location, int t_min, int t_max)
             it = sit[location].erase(it);
         }
     }
+    if (sit[location].empty()) // no safe intervals at this location
+        sit[location].emplace_back(-1, -1, -1);
 }
 
 void ReservationTable::insertSoftConstraint2SIT(int location, int t_min, int t_max)

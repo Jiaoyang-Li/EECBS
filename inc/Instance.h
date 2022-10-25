@@ -9,10 +9,11 @@ public:
 	int num_of_cols;
 	int num_of_rows;
 	int map_size;
+    set<int> avoid_locations; // agents without goal locations cannot end their paths with these locations
 
 	// enum valid_moves_t { NORTH, EAST, SOUTH, WEST, WAIT_MOVE, MOVE_COUNT };  // MOVE_COUNT is the enum's size
 
-	Instance(){}
+	Instance() =default;
 	Instance(const string& map_fname, const string& agent_fname, 
 		int num_of_agents = 0, int num_of_rows = 0, int num_of_cols = 0, int num_of_obstacles = 0, int warehouse_width = 0);
 
@@ -82,7 +83,7 @@ private:
 	  void generateConnectedRandomGrid(int rows, int cols, int obstacles); // initialize new [rows x cols] map with random obstacles
 	  void generateRandomAgents(int warehouse_width);
 	  bool addObstacle(int obstacle); // add this obsatcle only if the map is still connected
-	  bool isConnected(int start, int goal); // run BFS to find a path between start and goal, return true if a path exists.
+	  bool isConnected(int start, int goal) const; // run BFS to find a path between start and goal, return true if a path exists.
 
 	  int randomWalk(int loc, int steps) const;
 
