@@ -1488,8 +1488,6 @@ CBS::CBS(const Instance& instance, bool sipp, int screen) :
 			search_engines[i] = new SIPP(instance, i);
 		else
 			search_engines[i] = new SpaceTimeAStar(instance, i);
-
-		initial_constraints[i].goal_location = search_engines[i]->goal_location;
 	}
 	runtime_preprocessing = (double)(clock() - t) / CLOCKS_PER_SEC;
 

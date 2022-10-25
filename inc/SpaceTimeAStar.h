@@ -73,8 +73,6 @@ private:
 	heap_open_t open_list;
 	heap_focal_t focal_list;
 
-    ConstraintTable constraint_table;
-
 	// define typedef for hash_map
 	typedef unordered_set<AStarNode*, AStarNode::NodeHasher, AStarNode::eqnode> hashtable_t;
 	hashtable_t allNodes_table;

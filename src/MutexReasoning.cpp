@@ -48,8 +48,8 @@ shared_ptr<Conflict> MutexReasoning::findMutexConflict(int a1, int a2, CBSNode& 
     ConstraintTable ct1(initial_constraints[a1]);
     ConstraintTable ct2(initial_constraints[a2]);
 
-    ct1.build(node, a1);
-    ct2.build(node, a2);
+      ct1.insert2CT(node, a1);
+      ct2.insert2CT(node, a2);
     auto ip = IPMutexPropagation(&mdd_1_cpy, &mdd_2_cpy, search_engines[a1], search_engines[a2],
                                  ct1, ct2);
     con_vec a;

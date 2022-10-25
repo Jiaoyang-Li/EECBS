@@ -18,6 +18,7 @@ using boost::unordered_set;
 using std::vector;
 using std::list;
 using std::set;
+using std::map;
 using std::get;
 using std::tuple;
 using std::make_tuple;

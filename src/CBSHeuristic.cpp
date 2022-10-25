@@ -710,8 +710,8 @@ pair<int, int> CBSHeuristic::solve2Agents(int a1, int a2, const CBSNode& node, b
 	vector<SingleAgentSolver*> engines{search_engines[a1],   search_engines[a2]};
 	vector<vector<PathEntry>> initial_paths{*paths[a1], *paths[a2]};
 	vector<ConstraintTable> constraints{ConstraintTable(initial_constraints[a1]), ConstraintTable(initial_constraints[a2]) };
-	constraints[0].build(node, a1);
-	constraints[1].build(node, a2);
+    constraints[0].insert2CT(node, a1);
+    constraints[1].insert2CT(node, a2);
 	CBS cbs(engines, constraints, initial_paths, screen);
 	// setUpSubSolver(cbs);
 	cbs.setPrioritizeConflicts(PC);
@@ -761,8 +761,8 @@ tuple<int, int, int> CBSHeuristic::solve2Agents(int a1, int a2, const ECBSNode& 
 	vector<SingleAgentSolver*> engines{ search_engines[a1],   search_engines[a2] };
 	vector<vector<PathEntry>> initial_paths;
 	vector<ConstraintTable> constraints{ ConstraintTable(initial_constraints[a1]), ConstraintTable(initial_constraints[a2]) };
-	constraints[0].build(node, a1);
-	constraints[1].build(node, a2);
+    constraints[0].insert2CT(node, a1);
+    constraints[1].insert2CT(node, a2);
 	CBS cbs(engines, constraints, initial_paths, screen);
 	// setUpSubSolver(cbs);
 	cbs.setPrioritizeConflicts(PC);
