@@ -76,11 +76,11 @@ void CBS::findConflicts(HLNode& curr, int a1, int a2)
 		if (loc1 == loc2)
 		{
 			shared_ptr<Conflict> conflict(new Conflict());
-			if (target_reasoning && paths[a1]->size() == timestep + 1)
+			if (target_reasoning and search_engines[a1]->goal_location >=0 and paths[a1]->size() == timestep + 1)
 			{
 				conflict->targetConflict(a1, a2, loc1, timestep);
 			}
-			else if (target_reasoning && paths[a2]->size() == timestep + 1)
+			else if (target_reasoning and search_engines[a2]->goal_location >=0 and  paths[a2]->size() == timestep + 1)
 			{
 				conflict->targetConflict(a2, a1, loc1, timestep);
 			}
