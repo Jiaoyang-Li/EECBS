@@ -1,4 +1,7 @@
 # EECBS
+![test_ubuntu](https://github.com/Jiaoyang-Li/MAPF-LNS/actions/workflows/test_ubuntu.yml/badge.svg)
+![test_macos](https://github.com/Jiaoyang-Li/MAPF-LNS/actions/workflows/test_macos.yml/badge.svg)
+
  A bounded-suboptimal solver for Multi-Agent Path Finding
 
 
