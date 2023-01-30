@@ -154,7 +154,8 @@ void CBS::findConflicts(HLNode& curr)
 						break;
 					}
 				}
-				findConflicts(curr, a1, a2);
+				if (!skip)
+					findConflicts(curr, a1, a2);
 			}
 		}
 	}
