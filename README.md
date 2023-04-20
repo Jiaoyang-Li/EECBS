@@ -33,9 +33,9 @@ which works for a variety of [systems](https://anaconda.org/anaconda/libboost)
 (including linux, osx, and win).
 
 A third way you can try is to install Homebrew and then
-'''shell script
+```shell script
 brew install boost
-'''
+```
 
 If none of the above method works, you can also follow the instructions
 on the [boost](https://www.boost.org/) website and install it manually.
