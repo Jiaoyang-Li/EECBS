@@ -243,8 +243,12 @@ inline void SpaceTimeAStar::pushNode(AStarNode* node)
     node->open_handle = open_list.push(node);
     node->in_openlist = true;
     num_generated++;
-    if (node->getFVal() <= w * min_f_val)
-        node->focal_handle = focal_list.push(node);
+    if (node->getFVal() <= w * min_f_val || focal_list_.empty()) {
+        node->focal_handle = focal_list.push(node); 
+        if(focal_list_.size() == 1) {
+            this->min_f_val_ = node->getFVal();
+        }
+    }
 }
 
 
