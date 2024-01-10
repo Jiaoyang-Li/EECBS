@@ -221,7 +221,7 @@ pair<Path, int> SIPP::findSuboptimalPath(const HLNode& node, const ConstraintTab
             get<0>(interval) + curr->h_val <= reservation_table.constraint_table.length_max)
         {
             auto next_timestep = get<0>(interval);
-            int next_h_val = max(curr->h_val, curr->getFVal() - next_timestep);  // path max
+            int next_h_val = max(my_heuristic[curr->location], curr->getFVal() - next_timestep);  // path max
             auto next_collisions = curr->num_of_conflicts +
                                    (int)curr->collision_v * max(next_timestep - curr->timestep - 1, 0) // wait time
                                    + (int)get<2>(interval);

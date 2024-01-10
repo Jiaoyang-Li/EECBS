@@ -46,7 +46,7 @@ public:
 	int cost_error = 0;
 	bool fully_expanded = false;
 
-	HLNode* parent;
+	HLNode* parent = nullptr;
 	list<HLNode*> children;
 
 	inline int getFVal() const { return g_val + h_val; }
@@ -161,7 +161,7 @@ public:
 	pairing_heap< CBSNode*, compare<CBSNode::compare_node_by_inadmissible_f> >::handle_type open_handle;
 	pairing_heap< CBSNode*, compare<CBSNode::compare_node_by_d> >::handle_type focal_handle;
 
-	CBSNode* parent;
+	CBSNode* parent = nullptr;
 	list< pair< int, Path> > paths; // new paths
 	inline int getFHatVal() const override { return g_val + cost_to_go; }
 	inline int getNumNewPaths() const override { return (int) paths.size(); }

@@ -121,7 +121,7 @@ public:
 	~MDDTable() { clear(); }
 
 	MDD* findMDD(HLNode& node, int agent) const;
-	MDD * getMDD(HLNode& node, int agent, size_t mdd_levels);
+	MDD * getMDD(HLNode& node, int agent, int mdd_levels = -1);
 	// void findSingletons(HLNode& node, int agent, Path& path);
 	void clear();
 private:

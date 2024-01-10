@@ -590,14 +590,13 @@ MDD* MDDTable::findMDD(HLNode& node, int agent) const
         return nullptr;
 }
 
-MDD * MDDTable::getMDD(HLNode& node, int id, size_t mdd_levels)
+MDD * MDDTable::getMDD(HLNode& node, int id, int mdd_levels)
 {
 	ConstraintsHasher c(id, &node);
 	auto got = lookupTable[c.a].find(c);
 	if (got != lookupTable[c.a].end())
 	{
-		assert((node.getName() == "CBS Node" &&  got->second->levels.size() == mdd_levels) ||
-			(node.getName() == "ECBS Node" &&  got->second->levels.size() <= mdd_levels));
+		assert(mdd_levels < 0 or got->second->levels.size() == mdd_levels);
 		return got->second;
 	}
 	releaseMDDMemory(id);
@@ -605,9 +604,9 @@ MDD * MDDTable::getMDD(HLNode& node, int id, size_t mdd_levels)
 	MDD * mdd = new MDD();
 	ConstraintTable ct(initial_constraints[id]);
     ct.insert2CT(node, id);
-	if (node.getName() == "CBS Node")
+	if (mdd_levels >= 0)
 		mdd->buildMDD(ct, mdd_levels, search_engines[id]);
-	else // ECBS node
+	else
 		mdd->buildMDD(ct, search_engines[id]);
 	if (!lookupTable.empty())
 	{

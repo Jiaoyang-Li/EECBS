@@ -709,13 +709,13 @@ void ECBS::computeConflictPriority(shared_ptr<Conflict>& con, ECBSNode& node)
 		cardinal1 = true;
 	else //if (!paths[a1]->at(0).is_single())
 	{
-		mdd1 = mdd_helper.getMDD(node, a1, paths[a1]->size());
+		mdd1 = mdd_helper.getMDD(node, a1);
 	}
 	if (timestep >= (int)paths[a2]->size())
 		cardinal2 = true;
 	else //if (!paths[a2]->at(0).is_single())
 	{
-		mdd2 = mdd_helper.getMDD(node, a2, paths[a2]->size());
+		mdd2 = mdd_helper.getMDD(node, a2);
 	}
 
 	if (type == constraint_type::EDGE) // Edge conflict
