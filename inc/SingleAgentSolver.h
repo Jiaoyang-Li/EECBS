@@ -11,6 +11,7 @@ public:
 	LLNode* parent;
 	int timestep = 0;
 	int num_of_conflicts = 0;
+	double focal_val; // Weighted focal search priority
 	bool in_openlist = false;
 	bool wait_at_goal; // the action is to wait at the goal vertex or not. This is used for >length constraints
     bool is_goal = false;
@@ -37,7 +38,7 @@ public:
 	{
 		bool operator()(const LLNode* n1, const LLNode* n2) const // returns true if n1 > n2
 		{
-			if (n1->num_of_conflicts == n2->num_of_conflicts)
+			if (n1->focal_val == n2->focal_val) // Incorporates W-EECBS logic
 			{
                 if (n1->g_val + n1->h_val == n2->g_val + n2->h_val)
                 {
@@ -49,16 +50,18 @@ public:
                 }
                 return n1->g_val+n1->h_val >= n2->g_val+n2->h_val;  // break ties towards smaller f_vals (prefer shorter solutions)
 			}
-			return n1->num_of_conflicts >= n2->num_of_conflicts;  // n1 > n2 if it has more conflicts
+			return n1->focal_val >= n2->focal_val;  // n1 > n2 if it has more conflicts
 		}
 	};  // used by FOCAL (heap) to compare nodes (top of the heap has min number-of-conflicts)
 
 
-	LLNode() : location(0), g_val(0), h_val(0), parent(nullptr), timestep(0), num_of_conflicts(0), in_openlist(false), wait_at_goal(false) {}
+	LLNode() : location(0), g_val(0), h_val(0), parent(nullptr), timestep(0), num_of_conflicts(0), focal_val(0),
+				 in_openlist(false), wait_at_goal(false) {}
 
-	LLNode(int location, int g_val, int h_val, LLNode* parent, int timestep, int num_of_conflicts = 0, bool in_openlist = false) :
+	LLNode(int location, int g_val, int h_val, LLNode* parent, int timestep, int num_of_conflicts = 0, 
+			int focal_val = 0, bool in_openlist = false) :
 		location(location), g_val(g_val), h_val(h_val), parent(parent), timestep(timestep),
-		num_of_conflicts(num_of_conflicts), in_openlist(in_openlist), wait_at_goal(false) {}
+		num_of_conflicts(num_of_conflicts), focal_val(focal_val), in_openlist(in_openlist), wait_at_goal(false) {}
 
 	inline int getFVal() const { return g_val + h_val; }
 	void copy(const LLNode& other)
@@ -69,6 +72,7 @@ public:
 		parent = other.parent;
 		timestep = other.timestep;
 		num_of_conflicts = other.num_of_conflicts;
+		focal_val = other.focal_val;
 		wait_at_goal = other.wait_at_goal;
         is_goal = other.is_goal;
 	}
@@ -83,6 +87,11 @@ public:
 
 	double runtime_build_CT = 0; // runtime of building constraint table
 	double runtime_build_CAT = 0; // runtime of building conflict avoidance table
+
+	double r_weight = 4; // Default "good" values from Effective Integration Paper
+	double h_weight = 2; // Default "good" values from Effective Integration Paper
+	bool use_weighted_focal_search = false; // Use EECBS by default
+	void setWEECBS(double r, double h, bool use_weighted) { r_weight = r; h_weight = h; use_weighted_focal_search = use_weighted; }
 
 	int start_location;
 	int goal_location;

@@ -3,6 +3,8 @@
 #include "RectangleReasoning.h"
 #include "CorridorReasoning.h"
 #include "MutexReasoning.h"
+#include <random>      // std::default_random_engine
+#include <boost/program_options.hpp>  // variables_map
 
 enum high_level_solver_type { ASTAR, ASTAREPS, NEW, EES };
 
@@ -10,6 +12,12 @@ class CBS
 {
 public:
 	bool randomRoot = false; // randomize the order of the agents in the root CT node
+	std::mt19937 rng; // Random generator for root node ordering, restarts, and tie-breaking
+	int seed;
+	double r_weight = -1;
+	double h_weight = -1;
+	bool use_weighted_focal_search = false;
+	void setWEECBS(double r, double h, bool use_weighted); // Enables weighted low-level suboptimal for W-EECBS
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// stats
@@ -78,15 +86,16 @@ public:
 
 	int getLowerBound() const { return cost_lowerbound; }
 
-	CBS(const Instance& instance, bool sipp, int screen);
+	CBS(const Instance& instance, bool sipp, int screen, int seed = 0);
 	CBS(vector<SingleAgentSolver*>& search_engines,
 		const vector<ConstraintTable>& constraints,
-		vector<Path>& paths_found_initially, int screen);
+		vector<Path>& paths_found_initially, int screen, int seed = 0);
 	void clearSearchEngines();
 	~CBS();
 
 	// Save results
-	void saveResults(const string &fileName, const string &instanceName) const;
+	void saveResults(const string &fileName, const string &instanceName, 
+					const boost::program_options::variables_map& vm) const;
 	void saveStats(const string &fileName, const string &instanceName);
 	void saveCT(const string &fileName) const; // write the CT to a file
     void savePaths(const string &fileName) const; // write the paths to a file

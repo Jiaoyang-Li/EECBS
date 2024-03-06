@@ -1,5 +1,4 @@
 ﻿#include <algorithm>    // std::shuffle
-#include <random>      // std::default_random_engine
 #include <chrono>       // std::chrono::system_clock
 #include "CBS.h"
 #include "SIPP.h"
@@ -939,7 +938,8 @@ void CBS::printResults() const
     }*/
 }
 
-void CBS::saveResults(const string &fileName, const string &instanceName) const
+void CBS::saveResults(const string &fileName, const string &instanceName,
+					const boost::program_options::variables_map& vm) const
 {
 	std::ifstream infile(fileName);
 	bool exist = infile.good();
@@ -947,7 +947,9 @@ void CBS::saveResults(const string &fileName, const string &instanceName) const
 	if (!exist)
 	{
 		ofstream addHeads(fileName);
-		addHeads << "runtime,#high-level expanded,#high-level generated,#low-level expanded,#low-level generated," <<
+		addHeads << 
+			"mapFile,agentsFile,agentNum,cutoffTime,seed,suboptimality,useWeightedFocalSearch,r_weight,h_weight," <<
+			"runtime,#high-level expanded,#high-level generated,#low-level expanded,#low-level generated," <<
 			"solution cost,min f value,root g value, root f value," <<
 			"#adopt bypasses," <<
 			"cardinal conflicts," <<
@@ -964,7 +966,11 @@ void CBS::saveResults(const string &fileName, const string &instanceName) const
 		addHeads.close();
 	}
 	ofstream stats(fileName, std::ios::app);
-	stats << runtime << "," << 
+	stats <<
+		vm["mapFile"].as<string>() << "," << vm["agentsFile"].as<string>() << "," << vm["agentNum"].as<int>() << "," <<
+		vm["cutoffTime"].as<double>() << "," << vm["seed"].as<int>() << "," << vm["suboptimality"].as<double>() << "," <<
+		vm["useWeightedFocalSearch"].as<bool>() << "," << vm["r_weight"].as<double>() << "," << vm["h_weight"].as<double>() << "," << 
+	 	runtime << "," << 
 		num_HL_expanded << "," << num_HL_generated << "," <<
 		num_LL_expanded << "," << num_LL_generated << "," <<
 
@@ -1455,7 +1461,7 @@ void CBS::addConstraints(const HLNode* curr, HLNode* child1, HLNode* child2) con
 
 CBS::CBS(vector<SingleAgentSolver*>& search_engines,
 	const vector<ConstraintTable>& initial_constraints,
-	vector<Path>& paths_found_initially, int screen) :
+	vector<Path>& paths_found_initially, int screen, int seed) :
 	screen(screen), suboptimality(1), 
 	initial_constraints(initial_constraints), paths_found_initially(paths_found_initially),
 	search_engines(search_engines), 
@@ -1463,20 +1469,22 @@ CBS::CBS(vector<SingleAgentSolver*>& search_engines,
 	rectangle_helper(search_engines[0]->instance),
 	mutex_helper(search_engines[0]->instance, initial_constraints),
 	corridor_helper(search_engines, initial_constraints),
-	heuristic_helper(search_engines.size(), paths, search_engines, initial_constraints, mdd_helper)
+	heuristic_helper(search_engines.size(), paths, search_engines, initial_constraints, mdd_helper),
+	seed(seed), rng(seed)
 {
 	num_of_agents = (int) search_engines.size();
 	mutex_helper.search_engines = search_engines;
 }
 
-CBS::CBS(const Instance& instance, bool sipp, int screen) :
+CBS::CBS(const Instance& instance, bool sipp, int screen, int seed) :
 	screen(screen), suboptimality(1),
 	num_of_agents(instance.getDefaultNumberOfAgents()),
 	mdd_helper(initial_constraints, search_engines),
 	rectangle_helper(instance),
 	mutex_helper(instance, initial_constraints),
 	corridor_helper(search_engines, initial_constraints),
-	heuristic_helper(instance.getDefaultNumberOfAgents(), paths, search_engines, initial_constraints, mdd_helper)
+	heuristic_helper(instance.getDefaultNumberOfAgents(), paths, search_engines, initial_constraints, mdd_helper),
+	seed(seed), rng(seed)
 {
 	clock_t t = clock();
 	initial_constraints.resize(num_of_agents, 
@@ -1500,6 +1508,13 @@ CBS::CBS(const Instance& instance, bool sipp, int screen) :
 	}
 }
 
+// Sets low level searchers to include given weights
+void CBS::setWEECBS(double r, double h, bool use_weight) {
+	r_weight = r;
+	h_weight = h;
+	for (SingleAgentSolver* s : search_engines)
+		s->setWEECBS(r, h, use_weight);
+}
 
 //generate random permutation of agent indices
 vector<int> CBS::shuffleAgents() const
@@ -1510,12 +1525,14 @@ vector<int> CBS::shuffleAgents() const
 		agents[i] = i;
 	}
 
-	if (randomRoot)
-	{
-		std::random_device rd;
-		std::mt19937 g(rd());
+	// if (randomRoot)
+	// {
+		// std::random_device rd;
+		// std::mt19937 g(rd());
+		std::mt19937 g = rng;
 		std::shuffle(std::begin(agents), std::end(agents), g);
-	}
+	// }
+	// std::shuffle(std::begin(agents), std::end(agents), rng);
 	return agents;
 }
 
@@ -1534,18 +1551,7 @@ bool CBS::generateRoot()
 		paths_found_initially.resize(num_of_agents);
 
 		//generate random permutation of agent indices
-		vector<int> agents(num_of_agents);
-		for (int i = 0; i < num_of_agents; i++)
-		{
-			agents[i] = i;
-		}
-
-		if (randomRoot)
-		{
-			std::random_device rd;
-			std::mt19937 g(rd());
-			std::shuffle(std::begin(agents), std::end(agents), g);
-		}
+		vector<int> agents = shuffleAgents();
 
 		for (auto i : agents)
 		{

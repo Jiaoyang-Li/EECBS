@@ -54,7 +54,7 @@ pair<Path, int> SpaceTimeAStar::findSuboptimalPath(const HLNode& node, const Con
     lowerbound =  max(holding_time, lowerbound);
 
     // generate start and add it to the OPEN & FOCAL list
-    auto start = new AStarNode(start_location, 0, max(lowerbound, my_heuristic[start_location]), nullptr, 0, 0);
+    auto start = new AStarNode(start_location, 0, max(lowerbound, my_heuristic[start_location]), nullptr, 0, 0, 0);
 
     num_generated++;
     start->open_handle = open_list.push(start);
@@ -106,10 +106,17 @@ pair<Path, int> SpaceTimeAStar::findSuboptimalPath(const HLNode& node, const Con
                 continue;
             int next_internal_conflicts = curr->num_of_conflicts +
                                           constraint_table.getNumOfConflictsForStep(curr->location, next_location, next_timestep);
+            
+            // Compute the focal value which is either the number of conflicts or weighted sum of g-value, h-value, and number of conflicts
+            double focal_val;
+            if (use_weighted_focal_search)
+                focal_val = next_g_val + h_weight * (next_h_val + r_weight * next_internal_conflicts); // W-EECBS
+            else
+                focal_val = next_internal_conflicts; // EECBS
 
             // generate (maybe temporary) node
             auto next = new AStarNode(next_location, next_g_val, next_h_val,
-                                      curr, next_timestep, next_internal_conflicts);
+                                      curr, next_timestep, next_internal_conflicts, focal_val);
             if (next_location == goal_location && curr->location == goal_location)
                 next->wait_at_goal = true;
 
@@ -126,8 +133,11 @@ pair<Path, int> SpaceTimeAStar::findSuboptimalPath(const HLNode& node, const Con
             auto existing_next = *it;
             if (existing_next->getFVal() > next->getFVal() || // if f-val decreased through this new path
                 (existing_next->getFVal() == next->getFVal() &&
-                 existing_next->num_of_conflicts > next->num_of_conflicts)) // or it remains the same but there's fewer conflicts
+                 existing_next->focal_val > next->focal_val)) // or it remains the same but there's fewer conflicts
             {
+                if (static_timestep != next_timestep) // If we are doing space-time A* search, g & h will be identical for same state
+                    assert(existing_next->getFVal() == next->getFVal());
+
                 if (!existing_next->in_openlist) // if it is in the closed list (reopen)
                 {
                     existing_next->copy(*next);
@@ -172,7 +182,7 @@ int SpaceTimeAStar::getTravelTime(int start, int end, const ConstraintTable& con
 {
     int length = MAX_TIMESTEP;
     auto static_timestep = constraint_table.getMaxTimestep() + 1; // everything is static after this timestep
-    auto root = new AStarNode(start, 0, compute_heuristic(start, end), nullptr, 0, 0);
+    auto root = new AStarNode(start, 0, compute_heuristic(start, end), nullptr, 0);
     root->open_handle = open_list.push(root);  // add root to heap
     allNodes_table.insert(root);       // add root to hash_table (nodes)
     AStarNode* curr = nullptr;
@@ -204,7 +214,7 @@ int SpaceTimeAStar::getTravelTime(int start, int end, const ConstraintTable& con
                 int next_h_val = compute_heuristic(next_location, end);
                 if (next_g_val + next_h_val >= upper_bound) // the cost of the path is larger than the upper bound
                     continue;
-                auto next = new AStarNode(next_location, next_g_val, next_h_val, nullptr, next_timestep, 0);
+                auto next = new AStarNode(next_location, next_g_val, next_h_val, nullptr, next_timestep);
                 auto it = allNodes_table.find(next);
                 if (it == allNodes_table.end())
                 {  // add the newly generated node to heap and hash table

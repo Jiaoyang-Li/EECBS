@@ -22,14 +22,15 @@ int main(int argc, char** argv)
 		("help", "produce help message")
 
 		// params for the input instance and experiment settings
-		("map,m", po::value<string>()->required(), "input file for map")
-		("agents,a", po::value<string>()->required(), "input file for agents")
+		("mapFile,m", po::value<string>()->required(), "input file for map")
+		("agentsFile,a", po::value<string>()->required(), "input file for agents")
 		("output,o", po::value<string>(), "output file for statistics")
 		("outputPaths", po::value<string>(), "output file for paths")
 		("agentNum,k", po::value<int>()->default_value(0), "number of agents")
 		("cutoffTime,t", po::value<double>()->default_value(7200), "cutoff time (seconds)")
 		("screen,s", po::value<int>()->default_value(1), "screen option (0: none; 1: results; 2:all)")
 		("stats", po::value<bool>()->default_value(false), "write to files some detailed statistics")
+		("seed", po::value<int>()->default_value(0), "random seed")
 
 		// params for CBS node selection strategies
 		("highLevelSolver", po::value<string>()->default_value("EES"), "the high-level solver (A*, A*eps, EES, NEW)")
@@ -47,6 +48,11 @@ int main(int argc, char** argv)
 		("targetReasoning", po::value<bool>()->default_value(true), "target reasoning")
 		("sipp", po::value<bool>()->default_value(0), "using SIPPS as the low-level solver")
 		("restart", po::value<int>()->default_value(0), "rapid random restart times")
+
+		// params for W-EECBS (WF-EECBS) from Effective Integration of Weighted Cost-to-go and Conflict Heuristic paper
+		("r_weight", po::value<double>()->default_value(4), "the relative weight for the conflict-dependent term")
+		("h_weight", po::value<double>()->default_value(2), "the weight for the heuristic term")
+		("useWeightedFocalSearch", po::value<bool>()->default_value(false), "use weighted focal search")
 		;
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -127,21 +133,22 @@ int main(int argc, char** argv)
 	conflict_selection conflict = conflict_selection::EARLIEST;
 	node_selection n = node_selection::NODE_CONFLICTPAIRS;
 
-
-	srand((int)time(0));
+	int seed = vm["seed"].as<int>();
+	srand(seed);
 
 	///////////////////////////////////////////////////////////////////////////
 	// load the instance
-	Instance instance(vm["map"].as<string>(), vm["agents"].as<string>(),
+	Instance instance(vm["mapFile"].as<string>(), vm["agentsFile"].as<string>(),
 		vm["agentNum"].as<int>());
 
-	srand(0);
+	// srand(0);
 	int runs = 1 + vm["restart"].as<int>();
 	//////////////////////////////////////////////////////////////////////
     // initialize the solver
 	if (vm["lowLevelSolver"].as<bool>())
     {
-        ECBS ecbs(instance, vm["sipp"].as<bool>(), vm["screen"].as<int>());
+        ECBS ecbs(instance, vm["sipp"].as<bool>(), vm["screen"].as<int>(), seed);
+		ecbs.setWEECBS(vm["r_weight"].as<double>(), vm["h_weight"].as<double>(), vm["useWeightedFocalSearch"].as<bool>());
         ecbs.setPrioritizeConflicts(vm["prioritizingConflicts"].as<bool>());
         ecbs.setDisjointSplitting(vm["disjointSplitting"].as<bool>());
         ecbs.setBypass(vm["bypass"].as<bool>());
@@ -171,19 +178,19 @@ int main(int argc, char** argv)
         }
         ecbs.runtime = runtime;
         if (vm.count("output"))
-            ecbs.saveResults(vm["output"].as<string>(), vm["agents"].as<string>());
+            ecbs.saveResults(vm["output"].as<string>(), vm["agentsFile"].as<string>(), vm);
         if (ecbs.solution_found && vm.count("outputPaths"))
             ecbs.savePaths(vm["outputPaths"].as<string>());
         /*size_t pos = vm["output"].as<string>().rfind('.');      // position of the file extension
         string output_name = vm["output"].as<string>().substr(0, pos);     // get the name without extension
         cbs.saveCT(output_name); // for debug*/
         if (vm["stats"].as<bool>())
-            ecbs.saveStats(vm["output"].as<string>(), vm["agents"].as<string>());
+            ecbs.saveStats(vm["output"].as<string>(), vm["agentsFile"].as<string>());
         ecbs.clearSearchEngines();
     }
     else
     {
-        CBS cbs(instance, vm["sipp"].as<bool>(), vm["screen"].as<int>());
+        CBS cbs(instance, vm["sipp"].as<bool>(), vm["screen"].as<int>(), seed);
         cbs.setPrioritizeConflicts(vm["prioritizingConflicts"].as<bool>());
         cbs.setDisjointSplitting(vm["disjointSplitting"].as<bool>());
         cbs.setBypass(vm["bypass"].as<bool>());
@@ -213,11 +220,11 @@ int main(int argc, char** argv)
         }
         cbs.runtime = runtime;
         if (vm.count("output"))
-            cbs.saveResults(vm["output"].as<string>(), vm["agents"].as<string>());
+            cbs.saveResults(vm["output"].as<string>(), vm["agentsFile"].as<string>(), vm);
         if (cbs.solution_found && vm.count("outputPaths"))
             cbs.savePaths(vm["outputPaths"].as<string>());
         if (vm["stats"].as<bool>())
-            cbs.saveStats(vm["output"].as<string>(), vm["agents"].as<string>());
+            cbs.saveStats(vm["output"].as<string>(), vm["agentsFile"].as<string>());
         cbs.clearSearchEngines();
     }
 
