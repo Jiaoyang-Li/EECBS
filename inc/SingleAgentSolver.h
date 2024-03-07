@@ -59,7 +59,7 @@ public:
 				 in_openlist(false), wait_at_goal(false) {}
 
 	LLNode(int location, int g_val, int h_val, LLNode* parent, int timestep, int num_of_conflicts = 0, 
-			int focal_val = 0, bool in_openlist = false) :
+			double focal_val = 0, bool in_openlist = false) :
 		location(location), g_val(g_val), h_val(h_val), parent(parent), timestep(timestep),
 		num_of_conflicts(num_of_conflicts), focal_val(focal_val), in_openlist(in_openlist), wait_at_goal(false) {}
 
