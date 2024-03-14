@@ -82,6 +82,9 @@ public:
 class SingleAgentSolver
 {
 public:
+	clock_t start_time;
+	double time_limit;
+
 	uint64_t num_expanded = 0;
 	uint64_t num_generated = 0;
 

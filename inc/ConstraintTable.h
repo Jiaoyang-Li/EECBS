@@ -16,7 +16,7 @@ public:
 
     bool constrained(size_t loc, int t) const;
     bool constrained(size_t curr_loc, size_t next_loc, int next_t) const;
-    int getNumOfConflictsForStep(size_t curr_id, size_t next_id, int next_timestep) const;
+    int getNumOfConflictsForStep(size_t curr_id, size_t next_id, int next_timestep, bool at_goal) const;
     bool hasConflictForStep(size_t curr_id, size_t next_id, int next_timestep) const;
     bool hasEdgeConflict(size_t curr_id, size_t next_id, int next_timestep) const;
     int getFutureNumOfCollisions(int loc, int t) const;

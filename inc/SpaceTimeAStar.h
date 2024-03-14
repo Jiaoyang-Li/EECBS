@@ -77,6 +77,8 @@ private:
 	typedef unordered_set<AStarNode*, AStarNode::NodeHasher, AStarNode::eqnode> hashtable_t;
 	hashtable_t allNodes_table;
 
+	vector<AStarNode*> allNodes_vector;
+
 	// Updates the path datamember
 	void updatePath(const LLNode* goal, vector<PathEntry> &path);
 	void updateFocalList();

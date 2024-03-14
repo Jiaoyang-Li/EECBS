@@ -278,6 +278,8 @@ bool ECBS::generateRoot()
 
 	for (auto i : agents)
 	{
+		search_engines[i]->time_limit = time_limit;
+		search_engines[i]->start_time = start;
 		paths_found_initially[i] = search_engines[i]->findSuboptimalPath(*root, initial_constraints[i], paths, i, 0, suboptimality);
 		if (paths_found_initially[i].first.empty())
 		{

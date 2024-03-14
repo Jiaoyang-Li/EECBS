@@ -271,7 +271,7 @@ void ConstraintTable::copy(const ConstraintTable& other)
 }
 
 
-int ConstraintTable::getNumOfConflictsForStep(size_t curr_id, size_t next_id, int next_timestep) const
+int ConstraintTable::getNumOfConflictsForStep(size_t curr_id, size_t next_id, int next_timestep, bool at_goal) const
 {
     int rst = 0;
     if (!cat.empty())
@@ -283,6 +283,14 @@ int ConstraintTable::getNumOfConflictsForStep(size_t curr_id, size_t next_id, in
             rst++;
         if (cat_goals[next_id] < next_timestep)
             rst++;
+
+        if (at_goal) { // RVMod: Forward checking if there will be a conflict if the agent rests here
+            for (int t = next_timestep; t < (int) cat[next_id].size(); t++) {
+                if (cat[next_id][t]) {
+                    rst++;
+                }
+            }
+        }
     }
     return rst;
 }

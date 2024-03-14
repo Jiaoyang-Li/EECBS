@@ -106,54 +106,134 @@ def eecbs_vs_weecsb(args):
         "cutoffTime": args.cutoffTime,
         "useWeightedFocalSearch": False,
     }
-    seeds = list(range(10))
-    scens = helperCreateScens(1, args.mapName, args.dataPath)
+    seeds = list(range(1,2))
+    scens = helperCreateScens(25, args.mapName, args.dataPath)
     
-    increment = 100
+    increment = 50
     agentNumbers = list(range(increment, mapsToMaxNumAgents[args.mapName]+1, increment))
 
-    runOnSingleMap(eecbsArgs, args.mapName, agentNumbers, seeds, scens)
+    # runOnSingleMap(eecbsArgs, args.mapName, agentNumbers, seeds, scens)
+    # for r_w in [4,8,16,32]:
+    #     # eecbsArgs["r_weight"] = args.r_weight
+    #     eecbsArgs["r_weight"] = r_w
+    #     eecbsArgs["h_weight"] = 4  # args.h_weight
+    #     eecbsArgs["useWeightedFocalSearch"] = True
+    #     runOnSingleMap(eecbsArgs, args.mapName, agentNumbers, seeds, scens)
 
-    eecbsArgs["r_weight"] = args.r_weight
-    eecbsArgs["h_weight"] = args.h_weight
+    for s in [1.01, 1.1, 1.2, 1.5, 2, 4, 8]:
+        # eecbsArgs["r_weight"] = args.r_weight
+        eecbsArgs["suboptimality"] = s
+        runOnSingleMap(eecbsArgs, args.mapName, agentNumbers, seeds, scens)
+
+    eecbsArgs["r_weight"] = 4
+    eecbsArgs["h_weight"] = 4
     eecbsArgs["useWeightedFocalSearch"] = True
-    runOnSingleMap(eecbsArgs, args.mapName, agentNumbers, seeds, scens)
+    for s in [1.01, 1.1, 1.2, 1.5, 2, 4, 8]:
+        eecbsArgs["suboptimality"] = s
+        runOnSingleMap(eecbsArgs, args.mapName, agentNumbers, seeds, scens)
 
-    ### Load in the data
+    # ### Load in the data
+    # df = pd.read_csv(totalOutputPath)
+    # # Select only those with the correct cutoff time and suboptimality
+    # df = df[(df["cutoffTime"] == args.cutoffTime) & (df["suboptimality"] == args.suboptimality)]
+    
+    # dfRegEECBS = df[df["useWeightedFocalSearch"] == False]
+    # dfWEECBS = df[df["useWeightedFocalSearch"] == True]
+    # # Select only those with the correct weights
+    # dfWEECBS = dfWEECBS[(dfWEECBS["r_weight"] == args.r_weight) & (dfWEECBS["h_weight"] == args.h_weight)]
+
+
+    # ### Compare the relative speed up when the num agents and seeds are the same
+    # df = pd.merge(dfRegEECBS, dfWEECBS, on=["agentNum", "seed", "agentsFile"], how="inner", suffixes=("_reg", "_w"))
+    # df = df[(df["solution cost_reg"] != -1) & (df["solution cost_w"] != -1)] # Only include the runs that were successful
+    # df["speedup"] = df["runtime_reg"] / df["runtime_w"]
+    
+    # ### Plot speed up of W-EECBS over EECBS for each agent number
+    # df.boxplot(column="speedup", by="agentNum", grid=False)
+    # plt.title("Speedup of W-EECBS over EECBS on {}".format(args.mapName))
+    # plt.xlabel("Number of agents")
+    # plt.ylabel("Speedup")
+    # plt.show()
+
+def multi_plot(args):
+    if args.outputCSV == "":
+        args.outputCSV = args.mapName + ".csv"
+    totalOutputPath = "{}/{}".format(args.logPath, args.outputCSV)
+
     df = pd.read_csv(totalOutputPath)
     # Select only those with the correct cutoff time and suboptimality
-    df = df[(df["cutoffTime"] == args.cutoffTime) & (df["suboptimality"] == args.suboptimality)]
+    # df = df[(df["cutoffTime"] == args.cutoffTime) & (df["suboptimality"] == args.suboptimality)]
     
     dfRegEECBS = df[df["useWeightedFocalSearch"] == False]
     dfWEECBS = df[df["useWeightedFocalSearch"] == True]
     # Select only those with the correct weights
-    dfRegEECBS = dfRegEECBS[(dfRegEECBS["r_weight"] == args.r_weight) & (dfRegEECBS["h_weight"] == args.h_weight)]
+    # dfWEECBS = dfWEECBS[(dfWEECBS["r_weight"] == args.r_weight) & (dfWEECBS["h_weight"] == args.h_weight)]
 
 
     ### Compare the relative speed up when the num agents and seeds are the same
-    df = pd.merge(dfRegEECBS, dfWEECBS, on=["agentNum", "seed", "agentsFile"], how="inner", suffixes=("_reg", "_w"))
+    df = pd.merge(dfWEECBS, dfRegEECBS, on=["agentNum", "seed", "agentsFile", "suboptimality"], how="inner", suffixes=("_w", "_reg"))
     df = df[(df["solution cost_reg"] != -1) & (df["solution cost_w"] != -1)] # Only include the runs that were successful
     df["speedup"] = df["runtime_reg"] / df["runtime_w"]
+
+    # dfs = []
+    # medians = []
+    ### plot x-axis number of agents, y-axis speedup, each line is a different r_weight
+    whichPlot = ["r_weight", "suboptimality"][1]
+    if whichPlot == "r_weight":
+        plt.figure()
+        for r in [4,8,16,32]:
+            tmpdf = df[(df["r_weight_w"] == r) & (df["h_weight_w"] == 4)]
+            tmpdf = tmpdf.groupby("agentNum").median()
+            # dfs.append(tmpdf)
+            # medians.append(tmpdf["speedup"])
+            plt.plot(tmpdf.index, tmpdf["speedup"], label="r_weight={}".format(r))
+        
+        plt.title("Speedup of W-EECBS over EECBS on {}".format(args.mapName))
+        plt.xlabel("Number of agents")
+        plt.ylabel("Speedup")
+        plt.axhline(y=1, color='k', linestyle='--', alpha=0.5, label="baseline")
+        # plt.ylim(0, None)
+        plt.legend()
+        # plt.show()
+        plt.savefig("{}/speedup_{}.pdf".format(args.logPath, args.mapName))
+    elif whichPlot == "suboptimality":
+        plt.figure()
+        for s in [1.01, 1.1, 1.2, 1.5, 2, 4, 8]:
+            # pdb.set_trace()
+            tmpdf = df[(df["suboptimality"] == s) & (df["useWeightedFocalSearch_w"] == True)]
+            tmpdf = tmpdf.groupby("agentNum").median()
+            # dfs.append(tmpdf)
+            # medians.append(tmpdf["speedup"])
+            plt.plot(tmpdf.index, tmpdf["speedup"], label="suboptimality={}".format(s))
+        
+        plt.title("Speedup of W-EECBS over EECBS on {}".format(args.mapName))
+        plt.xlabel("Number of agents")
+        plt.ylabel("Speedup")
+        plt.axhline(y=1, color='k', linestyle='--', alpha=0.5, label="baseline")
+        # plt.ylim(0, None)
+        plt.legend()
+        # plt.show()
+        plt.savefig("{}/suboptimality_speedup_{}.pdf".format(args.logPath, args.mapName))
     
     ### Plot speed up of W-EECBS over EECBS for each agent number
-    df.boxplot(column="speedup", by="agentNum", grid=False)
-    plt.title("Speedup of W-EECBS over EECBS on {}".format(args.mapName))
-    plt.xlabel("Number of agents")
-    plt.ylabel("Speedup")
-    plt.show()
-
+    # df.boxplot(column="speedup", by="agentNum", grid=False)
+    # plt.title("Speedup of W-EECBS over EECBS on {}".format(args.mapName))
+    # plt.xlabel("Number of agents")
+    # plt.ylabel("Speedup")
+    # plt.show()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("mapName", help="map name without .map", type=str) # Note: Positional is required
     parser.add_argument("--dataPath", help="path to benchmark dataset, should contain mapf-map/ and mapf-scen-random/ folders",
                                       type=str, default="data")
-    parser.add_argument("--logPath", help="path to log folder", type=str, default="data/logs") 
+    parser.add_argument("--logPath", help="path to log folder", type=str, default="data/logs/hyper") 
     parser.add_argument("--outputCSV", help="outputCSV", type=str, default="") # Will be saved to logPath+outputCSV
     parser.add_argument("--cutoffTime", help="cutoffTime", type=int, default=60)
-    parser.add_argument("--suboptimality", help="suboptimality", type=float, default=1.2)
+    parser.add_argument("--suboptimality", help="suboptimality", type=float, default=2)
     parser.add_argument("--r_weight", help="r_weight", type=float, default=5)
     parser.add_argument("--h_weight", help="h_weight", type=float, default=8)
     args = parser.parse_args()
 
-    eecbs_vs_weecsb(args)
+    # eecbs_vs_weecsb(args)
+    multi_plot(args)

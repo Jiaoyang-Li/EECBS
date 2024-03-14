@@ -1528,8 +1528,8 @@ vector<int> CBS::shuffleAgents() const
 	// if (randomRoot)
 	// {
 		// std::random_device rd;
-		// std::mt19937 g(rd());
-		std::mt19937 g = rng;
+		// std::mt19937 g = rng;
+		std::mt19937 g(2);
 		std::shuffle(std::begin(agents), std::end(agents), g);
 	// }
 	// std::shuffle(std::begin(agents), std::end(agents), rng);
@@ -1557,6 +1557,8 @@ bool CBS::generateRoot()
 		{
 			//CAT cat(dummy_start->makespan + 1);  // initialized to false
 			//updateReservationTable(cat, i, *dummy_start);
+			search_engines[i]->time_limit = time_limit;
+			search_engines[i]->start_time = start;
 			paths_found_initially[i] = search_engines[i]->findOptimalPath(*root, initial_constraints[i], paths, i, 0);
 			if (paths_found_initially[i].empty())
 			{

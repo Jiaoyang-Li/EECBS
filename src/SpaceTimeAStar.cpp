@@ -64,7 +64,7 @@ pair<Path, int> SpaceTimeAStar::findSuboptimalPath(const HLNode& node, const Con
     min_f_val = (int) start->getFVal();
     // lower_bound = int(w * min_f_val));
 
-    while (!open_list.empty())
+    while (!open_list.empty() && ((double)(clock() - start_time) / CLOCKS_PER_SEC <= time_limit))
     {
         updateFocalList(); // update FOCAL if min f-val increased
         auto* curr = popNode();
@@ -104,8 +104,12 @@ pair<Path, int> SpaceTimeAStar::findSuboptimalPath(const HLNode& node, const Con
             int next_h_val = max(lowerbound - next_g_val, my_heuristic[next_location]);
             if (next_g_val + next_h_val > constraint_table.length_max)
                 continue;
+
+            //// This "optimization" actually hurts performance! It is better to incur the collision and resolve it later than try to avoid it now.
+            // bool is_at_goal = next_location == goal_location && !(next_location == goal_location && curr->location == goal_location)
+			// 													 && next_timestep >= holding_time;
             int next_internal_conflicts = curr->num_of_conflicts +
-                                          constraint_table.getNumOfConflictsForStep(curr->location, next_location, next_timestep);
+                                          constraint_table.getNumOfConflictsForStep(curr->location, next_location, next_timestep, false);
             
             // Compute the focal value which is either the number of conflicts or weighted sum of g-value, h-value, and number of conflicts
             double focal_val;
@@ -140,8 +144,16 @@ pair<Path, int> SpaceTimeAStar::findSuboptimalPath(const HLNode& node, const Con
 
                 if (!existing_next->in_openlist) // if it is in the closed list (reopen)
                 {
-                    existing_next->copy(*next);
-                    pushNode(existing_next);
+                    //// Old version rewires existing_next with next which causes instances where paths become cycles 
+                    // existing_next->copy(*next);
+                    // pushNode(existing_next);
+
+                    //// New version introduces a new node without rewiring the existing one
+                    pushNode(next);
+                    allNodes_vector.push_back(existing_next); // existing_next will be overwritten by next in allNodes_table
+                    allNodes_table.erase(existing_next); // Need to erase existing_next from allNodes_table
+                    allNodes_table.insert(next);  // Insert better one to be used for dominance check later on
+                    continue;
                 }
                 else
                 {
@@ -173,6 +185,8 @@ pair<Path, int> SpaceTimeAStar::findSuboptimalPath(const HLNode& node, const Con
         }  // end for loop that generates successors
     }  // end while loop
 
+    // int pathLength = path.size();
+    // cout << "Agent: " << agent << " length: " << path.size() << endl;
     releaseNodes();
     return {path, min_f_val};
 }
@@ -281,4 +295,8 @@ void SpaceTimeAStar::releaseNodes()
     for (auto node: allNodes_table)
         delete node;
     allNodes_table.clear();
+
+    for (auto node: allNodes_vector)
+        delete node;
+    allNodes_vector.clear();
 }
