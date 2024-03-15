@@ -16,7 +16,15 @@ bool ECBS::solve(double time_limit, int _cost_lowerbound)
 	// set timer
 	start = clock();
 
-	generateRoot();
+	bool made_root_node = generateRoot();
+	if (!made_root_node) {
+		//// If we timed out when 
+		solution_cost = -1;
+		solution_found = false;
+        if (screen > 0) // 1 or 2
+            printResults();
+		return false;
+	}
 
 	while (!cleanup_list.empty() && !solution_found)
 	{
@@ -263,8 +271,11 @@ void ECBS::updatePaths(ECBSNode* curr)
 bool ECBS::generateRoot()
 {
 	auto root = new ECBSNode();
+	dummy_start = root;
 	root->g_val = 0;
 	root->sum_of_costs = 0;
+	root->h_val = 0;
+	root->depth = 0;
 	paths.resize(num_of_agents, nullptr);
 	min_f_vals.resize(num_of_agents);
 	mdd_helper.init(num_of_agents);
@@ -283,6 +294,11 @@ bool ECBS::generateRoot()
 		paths_found_initially[i] = search_engines[i]->findSuboptimalPath(*root, initial_constraints[i], paths, i, 0, suboptimality);
 		if (paths_found_initially[i].first.empty())
 		{
+			//// We just timed out
+			runtime = (double)(clock() - start) / CLOCKS_PER_SEC;
+			if (runtime > time_limit)
+				return false;
+			//// If we didn't time out then we have a problem
 			cerr << "The start-goal locations of agent " << i << "are not connected" << endl;
 			exit(-1);
 		}
@@ -295,12 +311,9 @@ bool ECBS::generateRoot()
 		num_LL_generated += search_engines[i]->num_generated;
 	}
 
-	root->h_val = 0;
-	root->depth = 0;
 	findConflicts(*root);
     heuristic_helper.computeQuickHeuristics(*root);
 	pushNode(root);
-	dummy_start = root;
 
 	if (screen >= 2) // print start and goals
 		printPaths();

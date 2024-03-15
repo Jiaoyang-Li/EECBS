@@ -1211,7 +1211,15 @@ bool CBS::solve(double _time_limit, int _cost_lowerbound, int _cost_upperbound)
 	// set timer
 	start = clock();
 
-	generateRoot();
+	bool made_root_node = generateRoot();
+	if (!made_root_node) {
+		//// If we timed out when 
+		solution_cost = -1;
+		solution_found = false;
+        if (screen > 0) // 1 or 2
+            printResults();
+		return false;
+	}
 
 	while (!cleanup_list.empty() && !solution_found)
 	{
@@ -1525,21 +1533,18 @@ vector<int> CBS::shuffleAgents() const
 		agents[i] = i;
 	}
 
-	// if (randomRoot)
-	// {
-		// std::random_device rd;
-		// std::mt19937 g = rng;
-		std::mt19937 g(2);
-		std::shuffle(std::begin(agents), std::end(agents), g);
-	// }
-	// std::shuffle(std::begin(agents), std::end(agents), rng);
+	std::mt19937 g = rng;
+	std::shuffle(std::begin(agents), std::end(agents), g);
 	return agents;
 }
 
 bool CBS::generateRoot()
 {
 	auto root = new CBSNode();
+	dummy_start = root;
 	root->g_val = 0;
+	root->h_val = 0;
+	root->depth = 0;
 	paths.resize(num_of_agents, nullptr);
 
 	mdd_helper.init(num_of_agents);
@@ -1562,6 +1567,12 @@ bool CBS::generateRoot()
 			paths_found_initially[i] = search_engines[i]->findOptimalPath(*root, initial_constraints[i], paths, i, 0);
 			if (paths_found_initially[i].empty())
 			{
+				//// We just timed out
+				runtime = (double)(clock() - start) / CLOCKS_PER_SEC;
+				if (runtime > time_limit)
+					return false;
+				
+				//// If we didn't time out then we have a problem
 				if (screen >= 2)
 					cout << "No path exists for agent " << i << endl;
 				delete root;
@@ -1584,12 +1595,9 @@ bool CBS::generateRoot()
 		}
 	}
 
-	root->h_val = 0;
-	root->depth = 0;
 	findConflicts(*root);
 	heuristic_helper.computeQuickHeuristics(*root);
 	pushNode(root);
-	dummy_start = root;
 	if (screen >= 2) // print start and goals
 	{
 		printPaths();
