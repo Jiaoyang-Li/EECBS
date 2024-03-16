@@ -1,78 +1,73 @@
-# EECBS
+# W-EECBS
 ![test_ubuntu](https://github.com/Jiaoyang-Li/EECBS/actions/workflows/test_ubuntu.yml/badge.svg)
 ![test_macos](https://github.com/Jiaoyang-Li/EECBS/actions/workflows/test_macos.yml/badge.svg)
 
- A bounded-suboptimal solver for Multi-Agent Path Finding
 
+This branch contains the (relatively small) modifications required for W-EECBS with the low-level focal queue sorted by $g + w_h * (h + r * c)$ rather than just $c$.
+We additionally added a helpful `batch_runner.py` python file to run experiments to compare EECBS and W-EECBS on different maps with different overall suboptimality $w_{so}$ and different W-EECBS parameters $w_h, r$.
 
-Explicit Estimation Conflict-Based Search (EECBS) is an efficient bounded-suboptimal algorithm for solving Multi-Agent Path Finding (MAPF). 
-EECBS is 2-level search algorithm based on the popular optimal MAPF algorithm CBS. 
-It speeds up CBS by using Explicit Estimation Search (EES) on its high level and focal search on its low level. 
-It also incorporates with many CBS improvements, including 
-bypassing conflicts, prioritizing conflicts, high-level heuristics, and symmetry reasoning.
-More details can be found in our paper at AAAI 2021 [1].
-
-In addition to the techniques described in [1], we also add rapid random restart technique [2] to the code. 
-The default restart times is 0.  
-
-Moreover, we also added a SIPP option that uses SIPPS [3] (instead of state-time A*) in the low level of EECBS to plan paths for agents.
-
-The code requires the external library BOOST (https://www.boost.org/). After you installed BOOST and downloaded the source code, go into the directory of the source code and compile it with CMake: 
+For more details on W-EECBS please checkout the arXiv paper which is more up-to-date than the AAAI publication.
 
 ## Usage
-The code requires the external library [boost](https://www.boost.org/).
-If you are using Ubuntu, you can install it simply by
-```shell script
-sudo apt install libboost-all-dev
-``` 
-Another easy way of installing the boost library is to install anaconda/miniconda and then
-```shell script
-conda install -c anaconda libboost
-```
-which works for a variety of [systems](https://anaconda.org/anaconda/libboost)
-(including linux, osx, and win).
+### Step 1: Building
+First create build folders to keep the main folder unpopulated. We recommend creating two, one for debugging and one for running experiments.
 
-A third way you can try is to install Homebrew and then
 ```shell script
-brew install boost
-```
-
-If none of the above method works, you can also follow the instructions
-on the [boost](https://www.boost.org/) website and install it manually.
-
-
-After you installed boost and downloaded the source code, go into the directory of the source code and compile it with CMake:
-```shell script
-cmake -DCMAKE_BUILD_TYPE=RELEASE .
+## Debug version
+mkdir build_debug && cd build_release
+cmake -DCMAKE_BUILD_TYPE=RELEASE ..
 make
 ```
 
-Then, you are able to run the code:
-```
-./eecbs -m random-32-32-20.map -a random-32-32-20-random-1.scen -o test.csv --outputPaths=paths.txt -k 50 -t 60 --suboptimality=1.2 
+Make sure to `cd ..` to go back to your main workspace folder.
+
+```shell script
+## Release version
+mkdir build_release && cd build_release
+cmake -DCMAKE_BUILD_TYPE=RELEASE ..
+make
 ```
 
-- m: the map file from the MAPF benchmark
-- a: the scenario file from the MAPF benchmark
-- o: the output file that contains the search statistics
-- outputPaths: the output file that contains the paths 
-- k: the number of agents
-- t: the runtime limit
-- suboptimality: the suboptimality factor w
+### Step 2: Run Sanity Check
 
+You should be able to run the code:
+```
+./build_release/eecbs -m random-32-32-20.map -a random-32-32-20-random-1.scen -o test.csv --outputPaths=paths.txt -k 50 -t 60 --suboptimality=1.2 
+```
+
+You can run W-EECBS by adding in the required `r_weight` and `h_weight` parameters and setting `useWeightedFocalSearch=True`.
+```
+./build_release/eecbs -m random-32-32-20.map -a random-32-32-20-random-1.scen -o test.csv --outputPaths=paths.txt -k 50 -t 60 --suboptimality=1.2 --r_weight=4 --h_weight=8 --useWeightedFocalSearch=True
+```
 You can find more details and explanations for all parameters with:
 ```
-./eecbs --help
+./build_release/eecbs --help
 ```
+It will also be helpful to read `src/driver.cpp`.
 
-To test the code on more instances,
-you can download the MAPF instances from the [MAPF benchmark](https://movingai.com/benchmarks/mapf/index.html).
-In particular, the format of the scen files is explained [here](https://movingai.com/benchmarks/formats.html).
-For a given number of agents k, the first k rows of the scen file are used to generate the k pairs of start and target locations.
 
-## License
-EECBS is released under USC – Research License. See license.md for further details.
- 
+### Step 3: Set-up data folder with benchmarks
+We use the [standard 2D MAPF benchmark from MovingAI](https://movingai.com/benchmarks/mapf/index.html).
+
+Make sure to `cd ..` to go back to your main workspace folder.
+```shell script
+mkdir data
+cd data
+
+# Download maps
+wget https://movingai.com/benchmarks/mapf/mapf-map.zip
+unzip mapf-map.zip -f mapf-map
+
+# Download random scens; note other scens are available to try too
+wget https://movingai.com/benchmarks/mapf/mapf-scen-random.zip
+unzip mapf-scen-random.zip && mv scen-random mapf-scen-random  # Rename unzipped folder for consistency
+
+mkdir logs  # Optional, recommended for consistency with batch_runner.py
+``` 
+
+### Step 4: Use batch_python.py to compare W-EECBS with EECBS
+
+
 ## References
 [1] Jiaoyang Li, Wheeler Ruml and Sven Koenig.
 EECBS: Bounded-Suboptimal Search for Multi-Agent Path Finding.

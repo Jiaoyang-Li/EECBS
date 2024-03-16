@@ -155,9 +155,18 @@ def eecbs_vs_weecsb(args):
     plt.savefig("{}/{}_weecbsSo{}R{}H{}_speedup.pdf".format(args.logPath, args.mapName, args.suboptimality, args.r_weight, args.h_weight))
 
 
-def run_arxiv_results(args):
+def run_arxiv_results():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("mapName", help="map name without .map", type=str) # Note: Positional is required
+    parser.add_argument("--dataPath", help="path to benchmark dataset, should contain mapf-map/ and mapf-scen-random/ folders",
+                                      type=str, default="data")
+    parser.add_argument("--logPath", help="path to log folder", type=str, default="data/logs/arxiv") 
+    parser.add_argument("--outputCSV", help="outputCSV", type=str, default="") # Will be saved to logPath+outputCSV
+    args = parser.parse_args()
+
     """
     Run arxiv results
+    python batch_runner.py [mapname]
     """
     ### Create the folder for the output file if it does not exist
     if args.outputCSV == "":
@@ -274,18 +283,18 @@ def multi_plot(args):
 # python batch_runner.py warehouse-10-20-10-2-1 --logPath data/logs/fix --cutoffTime 60 --suboptimality 2
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("mapName", help="map name without .map", type=str) # Note: Positional is required
-    parser.add_argument("--dataPath", help="path to benchmark dataset, should contain mapf-map/ and mapf-scen-random/ folders",
-                                      type=str, default="data")
-    parser.add_argument("--logPath", help="path to log folder", type=str, default="data/logs/") 
-    parser.add_argument("--outputCSV", help="outputCSV", type=str, default="") # Will be saved to logPath+outputCSV
-    parser.add_argument("--cutoffTime", help="cutoffTime", type=int, default=60)
-    parser.add_argument("--suboptimality", help="suboptimality", type=float, default=2)
-    parser.add_argument("--r_weight", help="r_weight", type=float, default=4)
-    parser.add_argument("--h_weight", help="h_weight", type=float, default=8)
-    args = parser.parse_args()
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("mapName", help="map name without .map", type=str) # Note: Positional is required
+    # parser.add_argument("--dataPath", help="path to benchmark dataset, should contain mapf-map/ and mapf-scen-random/ folders",
+    #                                   type=str, default="data")
+    # parser.add_argument("--logPath", help="path to log folder", type=str, default="data/logs/") 
+    # parser.add_argument("--outputCSV", help="outputCSV", type=str, default="") # Will be saved to logPath+outputCSV
+    # parser.add_argument("--cutoffTime", help="cutoffTime", type=int, default=60)
+    # parser.add_argument("--suboptimality", help="suboptimality", type=float, default=2)
+    # parser.add_argument("--r_weight", help="r_weight", type=float, default=4)
+    # parser.add_argument("--h_weight", help="h_weight", type=float, default=8)
+    # args = parser.parse_args()
 
     # eecbs_vs_weecsb(args)
-    run_arxiv_results(args)
-    multi_plot(args)
+    run_arxiv_results()
+    # multi_plot(args)

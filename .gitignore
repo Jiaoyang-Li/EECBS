@@ -3,7 +3,8 @@ cmake-*
 
 .vscode/
 # Contains the maps & scens for the running, as well as logs
-data/ 
+data/
+data
 # Build folders
 build_debug/
 build_release/
