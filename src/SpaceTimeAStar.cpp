@@ -108,6 +108,8 @@ pair<Path, int> SpaceTimeAStar::findSuboptimalPath(const HLNode& node, const Con
             //// This "optimization" actually hurts performance! It is better to incur the collision and resolve it later than try to avoid it now.
             // bool is_at_goal = next_location == goal_location && !(next_location == goal_location && curr->location == goal_location)
 			// 													 && next_timestep >= holding_time;
+            // int next_internal_conflicts = curr->num_of_conflicts +
+            //                               constraint_table.getNumOfConflictsForStep(curr->location, next_location, next_timestep, is_at_goal);
             int next_internal_conflicts = curr->num_of_conflicts +
                                           constraint_table.getNumOfConflictsForStep(curr->location, next_location, next_timestep, false);
             
