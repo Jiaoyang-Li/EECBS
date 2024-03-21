@@ -56,7 +56,7 @@ cd data
 
 # Download maps
 wget https://movingai.com/benchmarks/mapf/mapf-map.zip
-unzip mapf-map.zip -f mapf-map
+unzip mapf-map.zip -d mapf-map
 
 # Download random scens; note other scens are available to try too
 wget https://movingai.com/benchmarks/mapf/mapf-scen-random.zip
@@ -66,7 +66,11 @@ mkdir logs  # Optional, recommended for consistency with batch_runner.py
 ``` 
 
 ### Step 4: Use batch_python.py to compare W-EECBS with EECBS
-
+We provided an initial python script to compare W-EECBS against EECBS.
+```shell script
+python batch_runner.py den312d --logPath data/logs/comparison --cutoffTime 10 --suboptimality 2 --r_weight=4 --h_weight=8
+```
+Feel free to try it out with different parameters or map instances. Feel free to modify this script as needed as well.
 
 ## Performance dependent on conflict heuristic computation
 When working on another project we realized that W-EECBS had a more accurate conflict estimate that accidentally hurt EECBS's performance. The arXiv discusses this more in-depth and shows updated results with the less accurate but better baseline performance conflict computation.

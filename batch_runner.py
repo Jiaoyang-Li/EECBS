@@ -116,6 +116,8 @@ def eecbs_vs_weecsb(args):
     """
     Compare the runtime of EECBS and W-EECBS
     """
+    if args.mapName not in mapsToMaxNumAgents:
+        raise KeyError("Map name {} not found in mapsToMaxNumAgents. Please add it to mapsToMaxNumAgents into the top of batch_script.py".format(args.mapName))
 
     ### Create the folder for the output file if it does not exist
     if args.outputCSV == "":
@@ -172,7 +174,7 @@ def eecbs_vs_weecsb(args):
 # python batch_runner.py den312d --logPath data/logs/test --cutoffTime 10 --suboptimality 2
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("mapName", help="map name without .map", type=str) # Note: Positional is required
+    parser.add_argument("mapName", help="map name without .map, needs to be in mapsToMaxNumAgents defined in the top", type=str) # Note: Positional is required
     parser.add_argument("--dataPath", help="path to benchmark dataset, should contain mapf-map/ and mapf-scen-random/ folders",
                                       type=str, default="data")
     parser.add_argument("--logPath", help="path to log folder", type=str, default="data/logs/") 
